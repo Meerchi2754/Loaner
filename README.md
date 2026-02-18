@@ -1,4 +1,4 @@
-# React + Vite
+<!-- # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -14,3 +14,11 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+ -->
+
+{console.log(JSON.stringify(allTransactions, null, 2))}
+I want the Current data entries is stored in Indexed DB.
+As new month start all entries are converted into JSON. Eg: Janurary.json
+When user request, we fetch particular month .json and Show that result json in UI.

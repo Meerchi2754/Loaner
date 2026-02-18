@@ -78,6 +78,17 @@ export async function seedDatabase() {
           note: "Parle G biscuits,Monaco",
           createdAt: new Date().toISOString(),
         },
+        {
+          type: "Expense",
+          amount: 20,
+          categoryId: categoryIds[0], // Food
+          subcategoryName: "DAHI",
+          paymentMethod: "UPI",
+          date: todayDate,
+          time: nowTime,
+          note: "Parle G biscuits,Monaco",
+          createdAt: "2026-01-15T10:15:16.152Z",
+        },
       ];
       console.log("Seeding Started: Adding sample transactions...");
 
