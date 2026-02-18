@@ -48,6 +48,7 @@ const LockScreen = () => {
   useEffect(() => {
     if (isUnlocked) {
       navigate("/home");
+      // navigate("/addtransaction");
     }
   }, [isUnlocked, navigate]);
 
