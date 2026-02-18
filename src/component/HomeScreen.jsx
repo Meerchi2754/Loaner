@@ -5,6 +5,10 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./HeaderNav";
 import StatsCards from "./StatsCard";
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -124,6 +128,33 @@ const HomeScreen = () => {
     }, {});
   }, [allTransactions]);
 
+  const categoryData = {
+    labels: Object.keys(categoryTotal),
+    datasets: [
+      {
+        data: Object.values(categoryTotal),
+        backgroundColor: [
+          "#34D399", // Green
+          "#F87171", // Red
+          "#FBBF24", // Yellow
+          "#60A5FA", // Blue
+          "#A78BFA", // Purple
+          "#F59E0B", // Orange
+        ],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const categoryOptions = {
+    plugins: {
+      legend: {
+        display: false, // Hide default legend
+      },
+    },
+    cutout: "70%", // Creates the donut effect
+  };
+
   const addTransaction = () => {
     navigate("/addtransaction");
   };
@@ -165,18 +196,38 @@ const HomeScreen = () => {
           ))
         )}
 
-        <h2>Category Breakdown</h2>
-        <ul>
-          {Object.entries(categoryTotal).map(([category, total]) => (
-            <li key={category}>
-              {category}: ₹{total}
-            </li>
-          ))}
-        </ul>
+        {/* Category Breakdown */}
+        <div className="bg-gray-900 p-4 sm:p-6 rounded-2xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-4">Category Breakdown</h2>
+          <div className="flex flex-col sm:flex-row items-center">
+            {/* Donut Chart */}
+            <div className="w-full sm:w-1/2">
+              <Doughnut data={categoryData} options={categoryOptions} />
+            </div>
+
+            {/* Legend */}
+            <div className="w-full sm:w-1/2 mt-4 sm:mt-0 sm:pl-4">
+              <ul className="space-y-2">
+                {Object.keys(categoryTotal).map((category, idx) => (
+                  <li key={category} className="flex items-center gap-2">
+                    <span
+                      className={`w-4 h-4 rounded-full`}
+                      style={{
+                        backgroundColor:
+                          categoryData.datasets[0].backgroundColor[idx],
+                      }}
+                    ></span>
+                    <span className="text-sm text-gray-300">{category}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
 
         <button
           onClick={() => navigate("/addtransaction")}
-          className="bg-blue-900 text-white py-2 px-4 rounded"
+          className="bg-blue-900 text-white py-2 px-4 rounded mt-4 w-full sm:w-auto"
         >
           Add Transaction
         </button>
