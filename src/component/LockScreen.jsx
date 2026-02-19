@@ -105,7 +105,7 @@ const LockScreen = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-4 sm:px-6 py-3 sm:py-4">
+      {/* <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-4 sm:px-6 py-3 sm:py-4">
         <div className="max-w-screen-lg mx-auto flex justify-around items-center gap-2 sm:gap-4">
           <NavItem icon="🏠" label="Home" />
           <NavItem icon="💸" label="Trans" />
@@ -113,7 +113,7 @@ const LockScreen = () => {
           <NavItem icon="💰" label="Budget" />
           <NavItem icon="⚙️" label="Settings" />
         </div>
-      </nav>
+      </nav> */}
     </div>
   );
 };

@@ -1,8 +1,31 @@
 import React, { use, useMemo, useState, useEffect } from "react";
 import { db } from "../db/appDB";
+import { useSelector } from "react-redux";
 
 const HistoryTransaction = ({ categories, allTransactions }) => {
-  const transactionLen = allTransactions.length;
+  const reduxCategories = useSelector((state) => state.category);
+  const finalCategories = categories || reduxCategories;
+  const [fetchedTransactions, setFetchedTransactions] = useState([]);
+  const finalAllTransactions = allTransactions || fetchedTransactions;
+
+  useEffect(() => {
+    if (!allTransactions) {
+      (async () => {
+        try {
+          const tx = await db.transactions.toArray();
+          setFetchedTransactions(tx);
+        } catch (err) {
+          console.error("Failed to load transactions:", err);
+        }
+      })();
+    }
+  }, [allTransactions]);
+
+  if (!Array.isArray(finalCategories)) {
+    return <p>Error: Categories not loaded</p>;
+  }
+
+  const transactionLen = finalAllTransactions.length;
   // group transactions by date label: Today, Yesterday, or YYYY-MM-DD
   const groupedByDate = useMemo(() => {
     const groups = {};
@@ -11,7 +34,7 @@ const HistoryTransaction = ({ categories, allTransactions }) => {
       .toISOString()
       .slice(0, 10);
 
-    for (const tx of allTransactions) {
+    for (const tx of finalAllTransactions) {
       // prefer explicit date field, fallback to createdAt slice if present
       const txDate =
         tx.date ?? (tx.createdAt ? tx.createdAt.slice(0, 10) : today);

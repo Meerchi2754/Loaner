@@ -13,19 +13,11 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
-  const categories = [
-    { name: "Food" },
-    { name: "Travel" },
-    { name: "Bills" },
-    { name: "Shopping" },
-    { name: "Salary" },
-    { name: "Rapido" },
-  ];
+  const categories = useSelector((state) => state.category);
   const [allTransactions, setAllTransactions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
   const budget = useSelector((state) => state.transaction.budget);
   useEffect(() => {
     let mounted = true;
@@ -43,7 +35,6 @@ const HomeScreen = () => {
     };
   }, []);
 
-  // total expense calculation
   const totalExpense = useLiveQuery(async () => {
     const expenses = await db.transactions
       .where("type")
@@ -58,8 +49,7 @@ const HomeScreen = () => {
     return expenses.reduce((sum, t) => sum + t.amount, 0);
   }, []);
 
-  // total income calculation
-  const totalIncome = useLiveQuery(async () => {
+ const totalIncome = useLiveQuery(async () => {
     const income = await db.transactions
       .where("type")
       .equals("Income")
@@ -112,7 +102,7 @@ const HomeScreen = () => {
   return (
     <>
       <div className="bg-[#121212] text-amber-50 w-full min-h-screen p-4 pt-21 relative ">
-        <Navbar totalBalance={totalBalance} budget={budget}/>
+        <Navbar totalBalance={totalBalance} budget={budget} />
         <StatsCards
           totalIncome={totalIncome}
           totalExpense={totalExpense}
@@ -154,7 +144,7 @@ const HomeScreen = () => {
         {/* Floating Action Button */}
         <button
           onClick={() => navigate("/addtransaction")}
-          className="fixed bottom-10 right-8 bg-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-blue-600 transition"
+          className="fixed bottom-25 right-5 bg-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-blue-600 transition"
         >
           +
         </button>
@@ -185,8 +175,6 @@ const HomeScreen = () => {
         <div className="p-4 sm:p-6">
           <History categories={categories} allTransactions={allTransactions} />
         </div>
-
-        
       </div>
     </>
   );
