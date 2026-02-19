@@ -112,7 +112,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
       <div className="flex justify-between items-center bg-linear-to-br from-white/10 via-white/5 to-white/10 p-4 rounded-lg shadow-md mb-4">
         <div>
           <p className="text-sm text-gray-400">Total Income</p>
-          <p className="text-lg font-bold text-green  -400">
+          <p className="text-lg font-bold text-green-400">
             ₹{totalIncome.toFixed(2)}
           </p>
         </div>
