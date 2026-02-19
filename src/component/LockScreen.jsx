@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import {
   FaWallet,
   FaHome,
@@ -7,13 +8,14 @@ import {
   FaWallet as FaBudget,
   FaCog,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const LockScreen = () => {
   const [pin, setPin] = useState(["", "", "", ""]);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const navigate = useNavigate();
-
+  const userPin = useSelector((state) => state.user.password);
   const handlePinInput = (index, value) => {
     if (value.length > 1) return;
     if (!/^\d*$/.test(value)) return;
@@ -34,14 +36,27 @@ const LockScreen = () => {
     }
   };
 
+  // const handleUnlock = () => {
+  //   if (pin.every((digit) => digit !== "")) {
+  //     setIsUnlocked(true);
+  //     // Reset PIN after 1 second
+  //     setTimeout(() => {
+  //       setPin(["", "", "", ""]);
+  //       //setIsUnlocked(false);
+  //     }, 1000);
+  //   }
+  // };
   const handleUnlock = () => {
     if (pin.every((digit) => digit !== "")) {
-      setIsUnlocked(true);
-      // Reset PIN after 1 second
-      setTimeout(() => {
-        setPin(["", "", "", ""]);
-        //setIsUnlocked(false);
-      }, 1000);
+      const enteredPin = pin.join(""); // Combine the PIN array into a single string
+      if (enteredPin === userPin) {
+        //localStorage.setItem("isAuthenticated", "true"); // Set authentication flag
+        navigate("/home"); // Redirect to the home page
+      } else {
+        toast.error("Incorrect PIN. Please try again.");
+        //alert("Incorrect PIN. Please try again."); // Show an error message
+        setPin(["", "", "", ""]); // Reset the PIN
+      }
     }
   };
 
