@@ -4,7 +4,7 @@ import { FaHome, FaList, FaChartPie, FaBullseye, FaCog } from "react-icons/fa";
 
 const BottomNav = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#121212] text-gray-400 flex justify-around items-center py-2 shadow-lg z-50">
+    <div className="fixed bottom-0 left-0 right-0  bg-black flex justify-around items-center py-2 shadow-lg z-50">
       {/* Home */}
       <NavLink
         to="/home"
@@ -20,7 +20,7 @@ const BottomNav = () => {
 
       {/* Transactions */}
       <NavLink
-        to="/transactions"
+        to="/transactionspath"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm ${
             isActive ? "text-blue-500" : "text-gray-400"

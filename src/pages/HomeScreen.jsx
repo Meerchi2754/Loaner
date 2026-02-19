@@ -3,13 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { db } from "../db/appDB";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./HeaderNav";
-import StatsCards from "./StatsCard";
+import Navbar from "../component/HeaderNav";
+import StatsCards from "../component/StatsCard";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import History from "./HistoryTransaction";
+import History from "../component/HistoryTransaction";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ const HomeScreen = () => {
 
             {/* Legend */}
             <div className="w-full sm:w-1/2 mt-4 sm:mt-0 sm:pl-4">
-              <ul className="space-y-2 grid grid-cols-2 ">
+              <ul className="space-y-2 grid grid-cols-3">
                 {Object.keys(categoryTotal).map((category, idx) => (
                   <li key={category} className="flex items-center gap-2">
                     <span
@@ -173,7 +174,6 @@ const HomeScreen = () => {
         )}
 
         <div className="p-4 sm:p-6">
-          <h2 className="text-white">Recent</h2>
           <History categories={categories} allTransactions={allTransactions} />
         </div>
       </div>

@@ -1,13 +1,14 @@
 import React, { use, useMemo, useState, useEffect } from "react";
 import { db } from "../db/appDB";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const HistoryTransaction = ({ categories, allTransactions }) => {
   const reduxCategories = useSelector((state) => state.category);
   const finalCategories = categories || reduxCategories;
   const [fetchedTransactions, setFetchedTransactions] = useState([]);
   const finalAllTransactions = allTransactions || fetchedTransactions;
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (!allTransactions) {
       (async () => {
@@ -81,7 +82,14 @@ const HistoryTransaction = ({ categories, allTransactions }) => {
       <div className=" text-white p-4 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Recent Transactions</h2>
-          <button className="text-blue-500 hover:underline">View All</button>
+          <button
+            className="text-blue-500 hover:underline"
+            onClick={() => {
+              navigate("/transactionspath");
+            }}
+          >
+            View All
+          </button>
         </div>
 
         {groupedByDate.orderedKeys.length === 0 ? (
