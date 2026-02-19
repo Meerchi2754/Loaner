@@ -22,3 +22,5 @@ If you are developing a production application, we recommend using TypeScript wi
 I want the Current data entries is stored in Indexed DB.
 As new month start all entries are converted into JSON. Eg: Janurary.json
 When user request, we fetch particular month .json and Show that result json in UI.
+
+Want to store category in Store So, I can easily access it anyehere.

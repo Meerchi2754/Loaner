@@ -3,6 +3,7 @@ import { db } from "../db/appDB";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+
 export default function AddTransaction() {
   const navigate = useNavigate();
 
@@ -88,6 +89,7 @@ export default function AddTransaction() {
             type="button"
             className="text-gray-400 hover:text-white"
             aria-label="close"
+            onClick={() => navigate("/home")}
           >
             ✕
           </button>

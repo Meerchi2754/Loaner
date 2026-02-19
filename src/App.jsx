@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { seedDatabase } from "./db/seed";
 import { ToastContainer } from "react-toastify";
 import AddTransaction from "./pages/AddTransaction";
+import HistoryTransaction from "./component/HistoryTransaction";
 
 function App() {
   useEffect(() => {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<LockScreen />} />
           <Route path="/home" element={<HomeScreen />} />
           <Route path="/addtransaction" element={<AddTransaction />} />
+          <Route path="/history" element={<HistoryTransaction />} />
         </Routes>
         <ToastContainer />
         {/* <LockScreen /> */}

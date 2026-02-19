@@ -1,6 +1,6 @@
 const Navbar = ({ totalBalance = 0, profileImage = null }) => {
   return (
-    <div className="text-white px-4 py-3 flex items-center justify-between shadow-lg">
+    <div className=" backdrop-blur-md bg-[#121212]/70 fixed top-0 left-0 right-0  text-white px-4 py-3 flex items-center justify-between shadow-lg z-10">
       {/* Left: App Icon */}
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-lg font-bold">

@@ -7,6 +7,7 @@ import Navbar from "./HeaderNav";
 import StatsCards from "./StatsCard";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import History from "./HistoryTransaction";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,6 +22,9 @@ const HomeScreen = () => {
     { name: "Rapido" },
   ];
   const [allTransactions, setAllTransactions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   const budget = useSelector((state) => state.transaction.budget);
   useEffect(() => {
@@ -63,60 +67,7 @@ const HomeScreen = () => {
     console.log(income);
     return income.reduce((sum, t) => sum + t.amount, 0);
   }, []);
-  const transactionLen = useLiveQuery(async () => {
-    const transactions = await db.transactions.toArray();
-    console.log(transactions);
-    return transactions.length;
-  }, []);
   const totalBalance = totalIncome - totalExpense;
-
-  //const transactions = useSelector((state) => state.transactions);
-
-  // group transactions by date label: Today, Yesterday, or YYYY-MM-DD
-  const groupedByDate = useMemo(() => {
-    const groups = {};
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000)
-      .toISOString()
-      .slice(0, 10);
-
-    for (const tx of allTransactions) {
-      // prefer explicit date field, fallback to createdAt slice if present
-      const txDate =
-        tx.date ?? (tx.createdAt ? tx.createdAt.slice(0, 10) : today);
-      const label =
-        txDate === today
-          ? "Today"
-          : txDate === yesterday
-            ? "Yesterday"
-            : txDate;
-
-      if (!groups[label]) groups[label] = [];
-      groups[label].push(tx);
-    }
-
-    // sort transactions inside each group by time (optional) descending
-    Object.values(groups).forEach((arr) =>
-      arr.sort((a, b) => {
-        const ta = (a.time ?? "00:00").replace(":", "");
-        const tb = (b.time ?? "00:00").replace(":", "");
-        return Number(tb) - Number(ta);
-      }),
-    );
-
-    // produce ordered keys: Today, Yesterday, then by date desc
-    const otherKeys = Object.keys(groups).filter(
-      (k) => k !== "Today" && k !== "Yesterday",
-    );
-    otherKeys.sort((a, b) => b.localeCompare(a)); // "YYYY-MM-DD" string compare works for ISO
-
-    const orderedKeys = [];
-    if (groups["Today"]) orderedKeys.push("Today");
-    if (groups["Yesterday"]) orderedKeys.push("Yesterday");
-    orderedKeys.push(...otherKeys);
-
-    return { groups, orderedKeys };
-  }, [allTransactions]);
 
   const categoryTotal = useMemo(() => {
     return allTransactions.reduce((acc, tx) => {
@@ -160,48 +111,23 @@ const HomeScreen = () => {
   };
   return (
     <>
-      <div className="bg-[#121212] text-amber-50 w-full min-h-screen p-4">
-        <Navbar totalBalance={totalBalance} budget={budget} />
+      <div className="bg-[#121212] text-amber-50 w-full min-h-screen p-4 pt-21 relative ">
+        <Navbar totalBalance={totalBalance} budget={budget}/>
         <StatsCards
           totalIncome={totalIncome}
           totalExpense={totalExpense}
           budget={budget}
         />
-        <h1>Total Balance:₹{totalBalance || 0}</h1>
-        <h1>Budget:₹{budget || 0}</h1>
-        <h1>Remaining Budget:₹{(budget || 0) - (totalExpense || 0)}</h1>
-        <h1>Total Expense:₹{totalExpense || 0}</h1>
-        <h1>Total Income:₹{totalIncome || 0}</h1>
-
-        <p>{transactionLen} transactions found</p>
-
-        {/* Grouped transactions by date */}
-        {groupedByDate.orderedKeys.length === 0 ? (
-          <p>No transactions yet</p>
-        ) : (
-          groupedByDate.orderedKeys.map((label) => (
-            <section key={label} className="mb-4">
-              <h3 className="text-lg font-semibold">{label}</h3>
-              <ul className="pl-4">
-                {groupedByDate.groups[label].map((t) => (
-                  <li key={t.id} className="py-1">
-                    {t.subcategoryName} - ₹{t.amount} -{" "}
-                    {categories[t.categoryId - 1]?.name ??
-                      `Category ${t.categoryId ?? "?"}`}{" "}
-                    - {t.paymentMethod} - {t.type}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))
-        )}
 
         {/* Category Breakdown */}
-        <div className="bg-gray-900 p-4 sm:p-6 rounded-2xl shadow-lg">
+        <div
+          className="p-4 sm:p-6 rounded-2xl shadow-lg bg-linear-to-br from-white/10 via-white/5 to-white/10
+                backdrop-blur-xl border border-white/20 mb-6"
+        >
           <h2 className="text-lg font-semibold mb-4">Category Breakdown</h2>
           <div className="flex flex-col sm:flex-row items-center">
             {/* Donut Chart */}
-            <div className="w-full sm:w-1/2">
+            <div className="w-40 h-40 sm:w-60 sm:h-60">
               <Doughnut data={categoryData} options={categoryOptions} />
             </div>
 
@@ -225,12 +151,42 @@ const HomeScreen = () => {
           </div>
         </div>
 
+        {/* Floating Action Button */}
         <button
           onClick={() => navigate("/addtransaction")}
-          className="bg-blue-900 text-white py-2 px-4 rounded mt-4 w-full sm:w-auto"
+          className="fixed bottom-10 right-8 bg-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-blue-600 transition"
         >
-          Add Transaction
+          +
         </button>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50">
+            <div className="bg-white w-3/4 h-3/4 rounded-2xl p-6 relative">
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ✕
+              </button>
+              <h2 className="text-lg font-semibold mb-4">Add Transaction</h2>
+              {/* Add your form or content here */}
+              {navigate("/addtransaction")}
+              {/* <button
+                onClick={() => navigate("/addtransaction")}
+                className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
+              >
+                Go to Add Transaction
+              </button> */}
+            </div>
+          </div>
+        )}
+
+        <div className="p-4 sm:p-6">
+          <History categories={categories} allTransactions={allTransactions} />
+        </div>
+
+        
       </div>
     </>
   );
