@@ -32,7 +32,7 @@ const BottomNav = () => {
       </NavLink>
 
       {/* Stats */}
-      <NavLink
+      {/* <NavLink
         to="/stats"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm ${
@@ -42,7 +42,7 @@ const BottomNav = () => {
       >
         <FaChartPie className="text-xl" />
         <span>Stats</span>
-      </NavLink>
+      </NavLink> */}
 
       {/* Budget */}
       <NavLink
