@@ -8,6 +8,7 @@ import StatsCards from "../component/StatsCard";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import History from "../component/HistoryTransaction";
+import BottomNav from "../component/BottomNav";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -177,6 +178,7 @@ const HomeScreen = () => {
           <History categories={categories} allTransactions={allTransactions} />
         </div>
       </div>
+      <BottomNav />
     </>
   );
 };

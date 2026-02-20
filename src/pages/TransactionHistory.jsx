@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { db } from "../db/appDB";
 import { useSelector } from "react-redux";
+import BottomNav from "../component/BottomNav";
 
 const TransactionHistory = ({ categories = [], allTransactions }) => {
   const reduxCategories = useSelector((state) => state.category);
@@ -184,6 +185,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
           </div>
         ))
       )}
+      <BottomNav />
     </div>
   );
 };

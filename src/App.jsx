@@ -6,10 +6,13 @@ import HomeScreen from "./pages/HomeScreen";
 import { useEffect } from "react";
 import { seedDatabase } from "./db/seed";
 import { ToastContainer } from "react-toastify";
+//PAGES
 import AddTransaction from "./pages/AddTransaction";
 import HistoryTransaction from "./component/HistoryTransaction";
-import BottomNav from "./component/BottomNav";
-import TranscationPage from "./pages/TransactionHistory"
+import Stats from "./pages/Stats";
+import TranscationPage from "./pages/TransactionHistory";
+import Settings from "./pages/Settings";
+import Budget from "./pages/Budget";
 
 function App() {
   useEffect(() => {
@@ -24,10 +27,12 @@ function App() {
           <Route path="/addtransaction" element={<AddTransaction />} />
           <Route path="/history" element={<HistoryTransaction />} />
           <Route path="/transactionspath" element={<TranscationPage />} />
-          
+          <Route path="/stats" element={<Stats />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/budget" element={<Budget />} />
+
           {/* <Route path="/bottom" element={<BottomNav />} /> */}
         </Routes>
-          <BottomNav />
         <ToastContainer />
         {/* <LockScreen /> */}
       </Provider>
