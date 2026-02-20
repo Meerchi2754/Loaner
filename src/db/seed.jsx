@@ -4,9 +4,8 @@ export async function seedDatabase() {
   try {
     // ---- Seed Categories ----
     const categoryCount = await db.categories.count();
-    let categoryIds = [];
-    const newISODate = new Date().toISOString();
     if (categoryCount === 0) {
+      const newISODate = new Date().toISOString();
       const categories = [
         { name: "Food", createdAt: newISODate },
         { name: "Travel", createdAt: newISODate },
@@ -16,18 +15,14 @@ export async function seedDatabase() {
         { name: "Rapido", createdAt: newISODate },
       ];
 
-      categoryIds = await db.categories.bulkAdd(categories, { allKeys: true });
+      await db.categories.bulkAdd(categories);
       console.log("✅ Categories seeded");
     } else {
-      // If already seeded, fetch category ids in same order
-      console.log("ℹ️ Categories already exist, fetching IDs...");
-      const allCategories = await db.categories.toArray();
-      categoryIds = allCategories.map((c) => c.id);
+      console.log("ℹ️ Categories already exist, skipping seeding...");
     }
 
     // ---- Seed Transactions ----
     const txCount = await db.transactions.count();
-
     if (txCount === 0) {
       const now = new Date();
       const todayDate = now.toISOString().slice(0, 10);
@@ -37,7 +32,7 @@ export async function seedDatabase() {
         {
           type: "Expense",
           amount: 250,
-          categoryId: categoryIds[0], // Food
+          categoryId: 1, // Food
           subcategoryName: "Lunch",
           paymentMethod: "Cash",
           date: todayDate,
@@ -48,7 +43,7 @@ export async function seedDatabase() {
         {
           type: "Expense",
           amount: 1200.5,
-          categoryId: categoryIds[1], // Travel
+          categoryId: 2, // Travel
           subcategoryName: "Fuel",
           paymentMethod: "Card",
           date: todayDate,
@@ -59,7 +54,7 @@ export async function seedDatabase() {
         {
           type: "Income",
           amount: 50000,
-          categoryId: categoryIds[4], // Salary
+          categoryId: 5, // Salary
           subcategoryName: "Monthly salary",
           paymentMethod: "Bank",
           date: todayDate,
@@ -70,28 +65,28 @@ export async function seedDatabase() {
         {
           type: "Expense",
           amount: 20,
-          categoryId: categoryIds[0], // Food
+          categoryId: 1, // Food
           subcategoryName: "Biscuit",
           paymentMethod: "UPI",
           date: todayDate,
           time: nowTime,
-          note: "Parle G biscuits,Monaco",
+          note: "Parle G biscuits, Monaco",
           createdAt: new Date().toISOString(),
         },
         {
           type: "Expense",
           amount: 20,
-          categoryId: categoryIds[0], // Food
-          subcategoryName: "DAHI",
+          categoryId: 1, // Food
+          subcategoryName: "Dahi",
           paymentMethod: "UPI",
           date: todayDate,
           time: nowTime,
-          note: "Parle G biscuits,Monaco",
+          note: "Parle G biscuits, Monaco",
           createdAt: "2026-01-15T10:15:16.152Z",
         },
       ];
-      console.log("Seeding Started: Adding sample transactions...");
 
+      console.log("Seeding Started: Adding sample transactions...");
       await db.transactions.bulkAdd(sampleTransactions);
       console.log("✅ Transactions seeded");
     }

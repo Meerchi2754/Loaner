@@ -3,12 +3,11 @@ import { db } from "../db/appDB";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-
 export default function AddTransaction() {
   const navigate = useNavigate();
 
   const [type, setType] = useState("Expense");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("GPAY UPI");
 
   const [categories, setCategories] = useState([]);
@@ -18,11 +17,12 @@ export default function AddTransaction() {
   const [subcategoriesId, setSubcategoriesId] = useState("");
   const [subcategoryName, setSubcategoryName] = useState("");
 
-  // date/time formatted for <input type="date"> and <input type="time">
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10)); // "YYYY-MM-DD"
   const [time, setTime] = useState(() => new Date().toTimeString().slice(0, 5)); // "HH:MM"
 
   const [note, setNote] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false); // State for recurring transactions
+  const [isLoading, setIsLoading] = useState(false); // Loading state for save button
 
   useEffect(() => {
     async function loadCategories() {
@@ -52,8 +52,13 @@ export default function AddTransaction() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // Validation
     if (!amount || Number(amount) <= 0) {
-      toast.error("Please Select a Category!");
+      toast.error("Please enter a valid amount greater than 0.");
+      return;
+    }
+    if (!categoryId) {
+      toast.error("Please select a category.");
       return;
     }
 
@@ -67,17 +72,24 @@ export default function AddTransaction() {
       date,
       time,
       note: note.trim() || null,
+      isRecurring,
       createdAt: new Date().toISOString(),
     };
 
-    await db.transactions.add(payload);
-
-    toast.success("Transaction Saved!");
-    navigate("/home");
-    setAmount("");
-    setNote("");
-    setSubcategoriesId("");
-    setSubcategoryName("");
+    try {
+      setIsLoading(true); // Set loading state
+      await db.transactions.add(payload);
+      toast.success("Transaction Saved!");
+      navigate("/home");
+      setAmount("");
+      setNote("");
+      setSubcategoriesId("");
+      setSubcategoryName("");
+    } catch (error) {
+      toast.error("Failed to save transaction. Please try again.");
+    } finally {
+      setIsLoading(false); // Reset loading state
+    }
   }
 
   return (
@@ -122,7 +134,7 @@ export default function AddTransaction() {
             </button>
           </div>
 
-          {/* Amount display */}
+          {/* Amount Input */}
           <div className="text-center">
             <div className="text-xs text-gray-400">AMOUNT</div>
             <div className="mt-2 flex items-end justify-center gap-2">
@@ -156,35 +168,7 @@ export default function AddTransaction() {
             </select>
           </div>
 
-          {/* Date & Payment Method Row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm text-gray-300 mb-2">Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-2">
-                Payment Method
-              </label>
-              <select
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
-              >
-                <option value="GPAY UPI">GPAY UPI</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="Bank">Bank</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Subcategory textarea */}
+          {/* Subcategory */}
           <div>
             <label className="block text-sm text-gray-300 mb-2">
               SubCategory
@@ -233,9 +217,14 @@ export default function AddTransaction() {
           <div>
             <button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow"
+              className={`w-full ${
+                isLoading
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+              } text-white font-semibold py-3 rounded-lg shadow`}
+              disabled={isLoading}
             >
-              Save Transaction
+              {isLoading ? "Saving..." : "Save Transaction"}
             </button>
           </div>
         </form>

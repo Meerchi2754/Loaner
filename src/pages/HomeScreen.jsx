@@ -12,15 +12,34 @@ import BottomNav from "../component/BottomNav";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-
 const HomeScreen = () => {
   const navigate = useNavigate();
-  const categories = useSelector((state) => state.category);
+  //const categories = useSelector((state) => state.category);
   const [allTransactions, setAllTransactions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const budget = useSelector((state) => state.transaction.budget);
+
+  // Load categories on mount
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const tx = await db.categories.toArray();
+        console.log("Loaded categories:", tx);
+        if (mounted) setCategories(tx);
+      } catch (err) {
+        console.error("Failed to load categories:", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Load transactions on mount
   useEffect(() => {
     let mounted = true;
     (async () => {

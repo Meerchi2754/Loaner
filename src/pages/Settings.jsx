@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import BottomNav from "../component/BottomNav";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +15,10 @@ export default function Settings() {
   const currentMonth = new Date().getMonth(); // Get the current month (0-indexed)
   const currentPassword = useSelector((state) => state.user.password);
   const password = useSelector((state) => state.user.password);
-
+  const categories = useSelector((state) => state.transaction.categories || []); // Fetch categories from Redux
+  const [isAddingCategory, setIsAddingCategory] = useState(false); // Toggle for Add Category
+  const [newCategoryName, setNewCategoryName] = useState(""); // State for category name
+  const [newCategoryIcon, setNewCategoryIcon] = useState(""); // State for category icon
   useEffect(() => {
     console.log("Updated password:", password);
   }, [password]); // Get the current password
@@ -72,6 +75,32 @@ export default function Settings() {
     toast.success("Password changed successfully!");
     setIsChangingPassword(false); // Hide the input field
     setNewPassword(""); // Clear the input field
+  };
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim() || !newCategoryIcon.trim()) {
+      toast.error("Please fill out both fields.");
+      return;
+    }
+
+    try {
+      const newCategory = {
+        name: newCategoryName.trim(),
+        icon: newCategoryIcon.trim(),
+        createdAt: new Date().toISOString(),
+      };
+
+      await db.categories.add(newCategory);
+
+      toast.success("Category added successfully!");
+
+      // Reset form
+      setIsAddingCategory(false);
+      setNewCategoryName("");
+      setNewCategoryIcon("");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add category");
+    }
   };
 
   return (
@@ -153,6 +182,53 @@ export default function Settings() {
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200"
               >
                 Change Password
+              </button>
+            )}
+          </div>
+          {/* Add Category */}
+          <div className="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-300 mb-2">
+              Add Category
+            </h3>
+            {isAddingCategory ? (
+              <div className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Enter category name"
+                  className="w-full p-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  value={newCategoryIcon}
+                  onChange={(e) => setNewCategoryIcon(e.target.value)}
+                  placeholder="Enter category icon (e.g., 🍔)"
+                  className="w-full p-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={handleAddCategory}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-200"
+                >
+                  Add Category
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAddingCategory(false);
+                    setNewCategoryName("");
+                    setNewCategoryIcon("");
+                  }}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAddingCategory(true)}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200"
+              >
+                Add Category
               </button>
             )}
           </div>

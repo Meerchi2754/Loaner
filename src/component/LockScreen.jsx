@@ -98,7 +98,8 @@ const LockScreen = () => {
             <input
               key={index}
               id={`pin-${index}`}
-              type="password"
+              type="password" // Keeps the input hidden
+              inputMode="numeric" // Ensures numeric keypad on mobile devices
               maxLength="1"
               value={digit}
               onChange={(e) => handlePinInput(index, e.target.value)}

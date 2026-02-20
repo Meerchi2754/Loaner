@@ -1,40 +1,37 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { db } from "../db/appDB";
-import { useSelector } from "react-redux";
+import { useLiveQuery } from "dexie-react-hooks";
 import BottomNav from "../component/BottomNav";
 
-const TransactionHistory = ({ categories = [], allTransactions }) => {
-  const reduxCategories = useSelector((state) => state.category);
-  const finalCategories = categories.length ? categories : reduxCategories;
-  const [fetchedTransactions, setFetchedTransactions] = useState([]);
-  const finalAllTransactions = allTransactions || fetchedTransactions;
-
+const TransactionHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
-  useEffect(() => {
-    if (!allTransactions) {
-      (async () => {
-        try {
-          const tx = await db.transactions.toArray();
-          setFetchedTransactions(tx);
-        } catch (err) {
-          console.error("Failed to load transactions:", err);
-        }
-      })();
-    }
-  }, [allTransactions]);
+  // 🔥 Live reactive data from Dexie
+  const transactions = useLiveQuery(() => db.transactions.toArray(), []);
+  const categories = useLiveQuery(() => db.categories.toArray(), []);
 
-  if (!Array.isArray(finalCategories)) {
-    return <p>Error: Categories not loaded</p>;
-  }
+  // ✅ Safe fallback for transactions and categories
+  const safeTransactions = transactions ?? [];
+  const safeCategories = categories ?? [];
 
+  // 🔥 Create category lookup map (O(1) access)
+  const categoryMap = useMemo(() => {
+    const map = {};
+    safeCategories.forEach((cat) => {
+      map[cat.id] = cat;
+    });
+    return map;
+  }, [safeCategories]);
+
+  // 🔥 Filter by selected month
   const filteredTransactions = useMemo(() => {
-    return finalAllTransactions.filter((tx) => {
+    return safeTransactions.filter((tx) => {
       const txDate = new Date(tx.date || tx.createdAt);
       return txDate.getMonth() + 1 === selectedMonth;
     });
-  }, [finalAllTransactions, selectedMonth]);
+  }, [safeTransactions, selectedMonth]);
 
+  // 🔥 Totals
   const totalExpense = useMemo(() => {
     return filteredTransactions
       .filter((tx) => tx.type === "Expense")
@@ -47,6 +44,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
       .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
   }, [filteredTransactions]);
 
+  // 🔥 Group by Date
   const groupedByDate = useMemo(() => {
     const groups = {};
     const today = new Date().toISOString().slice(0, 10);
@@ -57,6 +55,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
     for (const tx of filteredTransactions) {
       const txDate =
         tx.date ?? (tx.createdAt ? tx.createdAt.slice(0, 10) : today);
+
       const label =
         txDate === today
           ? "Today"
@@ -68,6 +67,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
       groups[label].push(tx);
     }
 
+    // Sort each day by time descending
     Object.values(groups).forEach((arr) =>
       arr.sort((a, b) => {
         const ta = (a.time ?? "00:00").replace(":", "");
@@ -79,6 +79,7 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
     const otherKeys = Object.keys(groups).filter(
       (k) => k !== "Today" && k !== "Yesterday",
     );
+
     otherKeys.sort((a, b) => b.localeCompare(a));
 
     const orderedKeys = [];
@@ -89,15 +90,16 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
     return { groups, orderedKeys };
   }, [filteredTransactions]);
 
-  // HANDLE MONTH CHANGES
   const handleMonthChange = (e) => {
     setSelectedMonth(Number(e.target.value));
   };
 
   return (
     <div className="bg-[#121212] text-white p-4 pt-6 shadow-lg pb-10 min-h-screen">
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Transaction History</h2>
+
         <select
           value={selectedMonth}
           onChange={handleMonthChange}
@@ -105,18 +107,23 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
         >
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i + 1} value={i + 1}>
-              {new Date(0, i).toLocaleString("default", { month: "long" })}
+              {new Date(0, i).toLocaleString("default", {
+                month: "long",
+              })}
             </option>
           ))}
         </select>
       </div>
-      <div className="flex justify-between items-center bg-linear-to-br from-white/10 via-white/5 to-white/10 p-4 rounded-lg shadow-md mb-4">
+
+      {/* Totals Card */}
+      <div className="flex justify-between items-center bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-4 rounded-lg shadow-md mb-4">
         <div>
           <p className="text-sm text-gray-400">Total Income</p>
           <p className="text-lg font-bold text-green-400">
             ₹{totalIncome.toFixed(2)}
           </p>
         </div>
+
         <div>
           <p className="text-sm text-gray-400">Total Expense</p>
           <p className="text-lg font-bold text-red-400">
@@ -124,6 +131,8 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
           </p>
         </div>
       </div>
+
+      {/* Transaction List */}
       {groupedByDate.orderedKeys.length === 0 ? (
         <p className="text-center text-gray-400">No transactions found</p>
       ) : (
@@ -132,59 +141,60 @@ const TransactionHistory = ({ categories = [], allTransactions }) => {
             <h3 className="text-gray-400 text-sm font-semibold mb-2">
               {label}
             </h3>
+
             <ul className="space-y-4">
-              {groupedByDate.groups[label].map((t) => (
-                <li
-                  key={t.id}
-                  className="flex items-center justify-between rounded-2xl shadow-lg bg-gray-800 p-4"
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Icon */}
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center bg-gray-700`}
-                    >
-                      <span className="text-xl text-white">
-                        {Array.isArray(finalCategories) &&
-                        finalCategories.find((c) => c.id === t.categoryId)
-                          ? finalCategories.find((c) => c.id === t.categoryId)
-                              .icon
-                          : "🍔"}
-                      </span>
+              {groupedByDate.groups[label].map((t) => {
+                const category = categoryMap[t.categoryId];
+
+                return (
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between rounded-2xl shadow-lg bg-gray-800 p-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Icon */}
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-700">
+                        <span className="text-xl text-white">
+                          {category?.icon ?? "🍔"}
+                        </span>
+                      </div>
+
+                      {/* Details */}
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {t.subcategoryName}
+                        </p>
+
+                        <p className="text-xs text-gray-400">
+                          {category?.name ?? `Category ${t.categoryId ?? "?"}`}{" "}
+                          • {t.paymentMethod}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Transaction Details */}
-                    <div>
-                      <p className="text-sm font-semibold">
-                        {t.subcategoryName}
+                    {/* Amount */}
+                    <div className="text-right">
+                      <p
+                        className={`text-sm font-bold ${
+                          t.type === "Income"
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {t.type === "Income" ? "+" : "-"}₹
+                        {Number(t.amount).toFixed(2)}
                       </p>
-                      <p className="text-xs text-gray-400">
-                        {Array.isArray(finalCategories) &&
-                        finalCategories.find((c) => c.id === t.categoryId)
-                          ? finalCategories.find((c) => c.id === t.categoryId)
-                              .name
-                          : `Category ${t.categoryId ?? "?"}`}{" "}
-                        • {t.paymentMethod}
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Amount and Time */}
-                  <div className="text-right">
-                    <p
-                      className={`text-sm font-bold ${
-                        t.type === "Income" ? "text-green-400" : "text-red-400"
-                      }`}
-                    >
-                      {t.type === "Income" ? "+" : "-"}₹{t.amount}
-                    </p>
-                    <p className="text-xs text-gray-400">{t.time ?? "N/A"}</p>
-                  </div>
-                </li>
-              ))}
+                      <p className="text-xs text-gray-400">{t.time ?? "N/A"}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))
       )}
+
       <BottomNav />
     </div>
   );

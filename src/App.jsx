@@ -1,41 +1,64 @@
-import LockScreen from "./component/LockScreen";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { store } from "../src/store/store";
-import { Provider } from "react-redux";
-import HomeScreen from "./pages/HomeScreen";
-import { useEffect } from "react";
 import { seedDatabase } from "./db/seed";
-import { ToastContainer } from "react-toastify";
-//PAGES
+import LockScreen from "./component/LockScreen";
+import HomeScreen from "./pages/HomeScreen";
 import AddTransaction from "./pages/AddTransaction";
 import HistoryTransaction from "./component/HistoryTransaction";
 import Stats from "./pages/Stats";
-import TranscationPage from "./pages/TransactionHistory";
+import TransactionPage from "./pages/TransactionHistory";
 import Settings from "./pages/Settings";
 import Budget from "./pages/Budget";
+import { ToastContainer } from "react-toastify";
+import { useDispatch } from "react-redux";
+// import { setCategories } from "./features/categorySlice";
+// import { db } from "./db/appDB";
 
 function App() {
+  const dispatch = useDispatch();
   useEffect(() => {
     seedDatabase();
   }, []);
+
+  // useEffect(() => {
+  //   async function loadCategories() {
+  //     try {
+  //       const data = await db.categories.toArray();
+  //       if (!data || data.length === 0) {
+  //         toast.error("Categories not loaded");
+  //         return;
+  //       }
+  //       setCategories(data); // Use setCategories to update state
+  //     } catch (error) {
+  //       console.error("Error loading categories:", error);
+  //       toast.error("Failed to load categories.");
+  //     }
+  //   }
+
+  //   loadCategories();
+  // }, []);
+  // useEffect(() => {
+  //   async function loadCategories() {
+  //     const categories = await db.categories.toArray();
+  //     dispatch(setCategories(categories));
+  //   }
+
+  //   loadCategories();
+  // }, []);
+
   return (
     <div>
-      <Provider store={store}>
-        <Routes>
-          <Route path="/" element={<LockScreen />} />
-          <Route path="/home" element={<HomeScreen />} />
-          <Route path="/addtransaction" element={<AddTransaction />} />
-          <Route path="/history" element={<HistoryTransaction />} />
-          <Route path="/transactionspath" element={<TranscationPage />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/budget" element={<Budget />} />
-
-          {/* <Route path="/bottom" element={<BottomNav />} /> */}
-        </Routes>
-        <ToastContainer />
-        {/* <LockScreen /> */}
-      </Provider>
+      <Routes>
+        <Route path="/" element={<LockScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
+        <Route path="/addtransaction" element={<AddTransaction />} />
+        <Route path="/history" element={<HistoryTransaction />} />
+        <Route path="/transactionspath" element={<TransactionPage />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/budget" element={<Budget />} />
+      </Routes>
+      <ToastContainer />
     </div>
   );
 }

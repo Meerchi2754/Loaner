@@ -1,23 +1,39 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [
-  { id: 1, name: "Food", icon: "🍔" },
-  { id: 2, name: "Travel", icon: "🚗" },
-  { id: 3, name: "Bills", icon: "💡" },
-  { id: 4, name: "Shopping", icon: "🛒" },
-  { id: 5, name: "Salary", icon: "💰" },
-  { id: 6, name: "Rapido", icon: "🏍️" },
-];
+const initialState = {
+  transactions: [],
+  categories: [], // ✅ ALWAYS plain array
+  budget: 0,
+};
 
-export const categorySlice = createSlice({
-  name: "category",
+export const transactionSlice = createSlice({
+  name: "transaction",
   initialState,
   reducers: {
-    addcategory: (state, action) => {
-      state.push(...action.payload);
+    setCategories: (state, action) => {
+      state.categories = action.payload;
+    },
+    addCategory: (state, action) => {
+      state.categories.push(action.payload);
+    },
+    addTransaction: (state, action) => {
+      state.transactions.push(action.payload);
+    },
+    resetTransactions: (state) => {
+      state.transactions = [];
+    },
+    setBudget: (state, action) => {
+      state.budget = action.payload;
     },
   },
 });
 
-export const { addcategory } = categorySlice.reducer;
-export default categorySlice.reducer;
+export const {
+  setCategories,
+  addCategory,
+  addTransaction,
+  resetTransactions,
+  setBudget,
+} = transactionSlice.actions;
+
+export default transactionSlice.reducer;
