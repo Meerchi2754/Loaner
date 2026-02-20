@@ -24,8 +24,8 @@ export default function Budget() {
     setNewBudget("");
   };
 
-  useEffect(() => {
-    console.log("Budget updated:", budget);
+  useEffect(() => { 
+    // console.log("Budget updated:", budget);
   }, [budget]);
 
   return (
