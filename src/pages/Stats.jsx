@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { db } from "../db/appDB";
-const Stats = () => {
+ export const Stats = () => {
   //   const [categoriesList, setCategoriesList] = useState([]);
 
   //   useEffect(() => {
