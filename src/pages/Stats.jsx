@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { db } from "../db/appDB";
- export const Stats = () => {
+export default function Stats() {
   //   const [categoriesList, setCategoriesList] = useState([]);
 
   //   useEffect(() => {
@@ -30,6 +30,7 @@ import { db } from "../db/appDB";
   //   }
   return (
     <div>
+      <h1>Categories</h1>
       {/* <h1>Categories</h1>
       <ul>
         {categoriesList.map((category) => (
@@ -38,6 +39,4 @@ import { db } from "../db/appDB";
       </ul> */}
     </div>
   );
-};
-
-export default Stats;
+}
