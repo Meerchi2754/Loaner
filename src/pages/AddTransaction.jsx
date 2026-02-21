@@ -8,7 +8,7 @@ export default function AddTransaction() {
 
   const [type, setType] = useState("Expense");
   const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("GPAY UPI");
+  const [paymentMethod, setPaymentMethod] = useState("GPAY"); // Default payment method
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
@@ -168,6 +168,23 @@ export default function AddTransaction() {
             </select>
           </div>
 
+          {/* Payment Method */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">
+              Payment Method
+            </label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
+            >
+              <option value="GPAY">GPAY</option>
+              <option value="BHIM">BHIM</option>
+              <option value="CASH">CASH</option>
+              <option value="CHEQUE">CHEQUE</option>
+            </select>
+          </div>
+
           {/* Subcategory */}
           <div>
             <label className="block text-sm text-gray-300 mb-2">
@@ -206,6 +223,8 @@ export default function AddTransaction() {
             <input
               id="recurring"
               type="checkbox"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
               className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-500"
             />
             <label htmlFor="recurring" className="text-sm text-gray-300">

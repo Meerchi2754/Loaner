@@ -15,10 +15,10 @@ import { useDispatch } from "react-redux";
 // import { db } from "./db/appDB";
 
 function App() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    seedDatabase();
-  }, []);
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   seedDatabase();
+  // }, []);
 
   // useEffect(() => {
   //   async function loadCategories() {
