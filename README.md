@@ -25,10 +25,15 @@ When user request, we fetch particular month .json and Show that result json in 
 
 Want to store category in Store So, I can easily access it anyehere.
 
-
 TODO:
 Add FEES, RENT, PAPA sent money Data.
 Add Feb Data.
 
 Instruction:
 Dont add from app. It take entry in dataset which will reflect on HOME PAGE.
+
+BUG:
+If a add a category.
+then add transaction of that category.
+So, when I Restart the app.
+the category will be gone.
