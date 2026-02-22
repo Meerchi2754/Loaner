@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { db } from "../db/appDB";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useNavigate } from "react-router-dom";
@@ -14,81 +14,71 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
-  //const categories = useSelector((state) => state.category);
-  const [allTransactions, setAllTransactions] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+
+  // ✅ Redux state
   const budget = useSelector((state) => state.transaction.budget);
+  const categories = useSelector(
+    (state) => state.category.categories || []
+  );
 
-  // Load categories on mount
-  const [categories, setCategories] = useState([]);
+  const [allTransactions, setAllTransactions] = useState([]);
+
+  // ✅ Load transactions from IndexedDB
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      try {
-        const tx = await db.categories.toArray();
-        console.log("Loaded categories:", tx);
-        if (mounted) setCategories(tx);
-      } catch (err) {
-        console.error("Failed to load categories:", err);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
-  // Load transactions on mount
-  useEffect(() => {
-    let mounted = true;
     (async () => {
       try {
         const tx = await db.transactions.toArray();
-        console.log("Loaded transactions:", tx);
         if (mounted) setAllTransactions(tx);
       } catch (err) {
         console.error("Failed to load transactions:", err);
       }
     })();
+
     return () => {
       mounted = false;
     };
   }, []);
 
+  // ✅ Live total expense
   const totalExpense = useLiveQuery(async () => {
     const expenses = await db.transactions
       .where("type")
       .equals("Expense")
       .toArray();
-    console.log(expenses);
-    console.log(
-      "Calculating total expense from transactions:",
-      expenses.reduce((sum, t) => sum + t.amount, 0),
-    );
 
     return expenses.reduce((sum, t) => sum + t.amount, 0);
   }, []);
 
+  // ✅ Live total income
   const totalIncome = useLiveQuery(async () => {
     const income = await db.transactions
       .where("type")
       .equals("Income")
       .toArray();
-    console.log(income);
+
     return income.reduce((sum, t) => sum + t.amount, 0);
   }, []);
-  const totalBalance = totalIncome - totalExpense;
 
+  const totalBalance =
+    (totalIncome || 0) - (totalExpense || 0);
+
+  // ✅ Safe category mapping (NO index-based logic)
   const categoryTotal = useMemo(() => {
     return allTransactions.reduce((acc, tx) => {
-      const catName =
-        categories[tx.categoryId - 1]?.name ??
-        `Category ${tx.categoryId ?? "?"}`;
-      acc[catName] = (acc[catName] || 0) + Number(tx.amount || 0);
+      const categoryObj = categories.find(
+        (c) => c.id === tx.categoryId
+      );
+
+      const catName = categoryObj?.name ?? "Unknown";
+
+      acc[catName] =
+        (acc[catName] || 0) + Number(tx.amount || 0);
+
       return acc;
     }, {});
-  }, [allTransactions]);
+  }, [allTransactions, categories]);
 
   const categoryData = {
     labels: Object.keys(categoryTotal),
@@ -96,12 +86,12 @@ const HomeScreen = () => {
       {
         data: Object.values(categoryTotal),
         backgroundColor: [
-          "#34D399", // Green
-          "#F87171", // Red
-          "#FBBF24", // Yellow
-          "#60A5FA", // Blue
-          "#A78BFA", // Purple
-          "#F59E0B", // Orange
+          "#34D399",
+          "#F87171",
+          "#FBBF24",
+          "#60A5FA",
+          "#A78BFA",
+          "#F59E0B",
         ],
         borderWidth: 0,
       },
@@ -111,52 +101,60 @@ const HomeScreen = () => {
   const categoryOptions = {
     plugins: {
       legend: {
-        display: false, // Hide default legend
+        display: false,
       },
     },
-    cutout: "70%", // Creates the donut effect
+    cutout: "70%",
   };
 
-  const addTransaction = () => {
-    navigate("/addtransaction");
-  };
   return (
     <>
-      <div className="bg-[#121212] text-amber-50 w-full min-h-screen p-4 pt-21 relative ">
+      <div className="bg-[#121212] text-amber-50 w-full min-h-screen p-4 pt-21 relative">
         <Navbar totalBalance={totalBalance} budget={budget} />
+
         <StatsCards
-          totalIncome={totalIncome}
-          totalExpense={totalExpense}
+          totalIncome={totalIncome || 0}
+          totalExpense={totalExpense || 0}
           budget={budget}
         />
 
         {/* Category Breakdown */}
-        <div
-          className="p-4 sm:p-6 rounded-2xl shadow-lg bg-linear-to-br from-white/10 via-white/5 to-white/10
-                backdrop-blur-xl border border-white/20 mb-6"
-        >
-          <h2 className="text-lg font-semibold mb-4">Category Breakdown</h2>
+        <div className="p-4 sm:p-6 rounded-2xl shadow-lg bg-linear-to-br from-white/10 via-white/5 to-white/10 backdrop-blur-xl border border-white/20 mb-6">
+          <h2 className="text-lg font-semibold mb-4">
+            Category Breakdown
+          </h2>
+
           <div className="flex flex-col sm:flex-row items-center">
-            {/* Donut Chart */}
             <div className="w-40 h-40 sm:w-60 sm:h-60">
-              <Doughnut data={categoryData} options={categoryOptions} />
+              <Doughnut
+                data={categoryData}
+                options={categoryOptions}
+              />
             </div>
 
-            {/* Legend */}
+            {/* Custom Legend */}
             <div className="w-full sm:w-1/2 mt-4 sm:mt-0 sm:pl-4">
               <ul className="space-y-2 grid grid-cols-3">
-                {Object.keys(categoryTotal).map((category, idx) => (
-                  <li key={category} className="flex items-center gap-2">
-                    <span
-                      className={`w-4 h-4 rounded-full`}
-                      style={{
-                        backgroundColor:
-                          categoryData.datasets[0].backgroundColor[idx],
-                      }}
-                    ></span>
-                    <span className="text-sm text-gray-300">{category}</span>
-                  </li>
-                ))}
+                {Object.keys(categoryTotal).map(
+                  (category, idx) => (
+                    <li
+                      key={category}
+                      className="flex items-center gap-2"
+                    >
+                      <span
+                        className="w-4 h-4 rounded-full"
+                        style={{
+                          backgroundColor:
+                            categoryData.datasets[0]
+                              .backgroundColor[idx],
+                        }}
+                      ></span>
+                      <span className="text-sm text-gray-300">
+                        {category}
+                      </span>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           </div>
@@ -170,33 +168,15 @@ const HomeScreen = () => {
           +
         </button>
 
-        {/* Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50">
-            <div className="bg-white w-3/4 h-3/4 rounded-2xl p-6 relative">
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
-              >
-                ✕
-              </button>
-              <h2 className="text-lg font-semibold mb-4">Add Transaction</h2>
-              {/* Add your form or content here */}
-              {navigate("/addtransaction")}
-              {/* <button
-                onClick={() => navigate("/addtransaction")}
-                className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
-              >
-                Go to Add Transaction
-              </button> */}
-            </div>
-          </div>
-        )}
-
+        {/* Transaction History */}
         <div className="p-4 sm:p-6">
-          <History categories={categories} allTransactions={allTransactions} />
+          <History
+            categories={categories}
+            allTransactions={allTransactions}
+          />
         </div>
       </div>
+
       <BottomNav />
     </>
   );

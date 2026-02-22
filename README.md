@@ -24,3 +24,11 @@ As new month start all entries are converted into JSON. Eg: Janurary.json
 When user request, we fetch particular month .json and Show that result json in UI.
 
 Want to store category in Store So, I can easily access it anyehere.
+
+
+TODO:
+Add FEES, RENT, PAPA sent money Data.
+Add Feb Data.
+
+Instruction:
+Dont add from app. It take entry in dataset which will reflect on HOME PAGE.

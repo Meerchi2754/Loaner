@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { jsPDF } from "jspdf";
 import { db } from "../db/appDB";
 import { passwordChanger } from "../features/userSlice";
+import { addCategories } from "../features/categorySlice";
 
 export default function Settings() {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ export default function Settings() {
   const currentMonth = new Date().getMonth(); // Get the current month (0-indexed)
   const currentPassword = useSelector((state) => state.user.password);
   const password = useSelector((state) => state.user.password);
-  const categories = useSelector((state) => state.transaction.categories || []); // Fetch categories from Redux
+  const categories = useSelector((state) => state.category.categories || []); // Fetch categories from Redux
   const [isAddingCategory, setIsAddingCategory] = useState(false); // Toggle for Add Category
   const [newCategoryName, setNewCategoryName] = useState(""); // State for category name
   const [newCategoryIcon, setNewCategoryIcon] = useState(""); // State for category icon
@@ -77,20 +78,26 @@ export default function Settings() {
     setNewPassword(""); // Clear the input field
   };
   const handleAddCategory = async () => {
-    if (!newCategoryName.trim() || !newCategoryIcon.trim()) {
-      toast.error("Please fill out both fields.");
-      return;
-    }
+    // if (!newCategoryName.trim() || !newCategoryIcon.trim()) {
+    //   toast.error("Please fill out both fields.");
+    //   return;
+    // }
 
     try {
+      console.log("categories length:", categories.length);
+      const nextId =
+        categories.length > 0
+          ? Math.max(...categories.map((c) => c.id)) + 1
+          : 1;
       const newCategory = {
+        id: nextId,
         name: newCategoryName.trim(),
         icon: newCategoryIcon.trim(),
         createdAt: new Date().toISOString(),
       };
 
-      await db.categories.add(newCategory);
-
+      //await db.categories.add(newCategory);
+      dispatch(addCategories(newCategory));
       toast.success("Category added successfully!");
 
       // Reset form

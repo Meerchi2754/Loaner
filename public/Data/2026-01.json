@@ -1,0 +1,103 @@
+[
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-01", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-01T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 100, "categoryId": 1, "subcategoryName": "Jeera", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Jeera", "createdAt": "2026-01-02T10:00:00.000Z" },
+  { "type": "Expense", "amount": 100, "categoryId": 2, "subcategoryName": "Petrol", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Petrol", "createdAt": "2026-01-02T10:00:00.000Z" },
+  { "type": "Expense", "amount": 14, "categoryId": 7, "subcategoryName": "Xerox", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Xerox", "createdAt": "2026-01-02T10:00:00.000Z" },
+  { "type": "Expense", "amount": 100, "categoryId": 1, "subcategoryName": "Milk", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Milk", "createdAt": "2026-01-02T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 250, "categoryId": 2, "subcategoryName": "Auto Rickshaw", "paymentMethod": "Cash", "date": "2026-01-03", "time": "10:00", "note": "Auto Rickshaw", "createdAt": "2026-01-03T10:00:00.000Z" },
+  { "type": "Expense", "amount": 90, "categoryId": 1, "subcategoryName": "Wafer", "paymentMethod": "Cash", "date": "2026-01-03", "time": "10:00", "note": "Wafer", "createdAt": "2026-01-03T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-04", "time": "10:00", "note": "Tea", "createdAt": "2026-01-04T10:00:00.000Z" },
+  { "type": "Expense", "amount": 30, "categoryId": 2, "subcategoryName": "Bus", "paymentMethod": "Cash", "date": "2026-01-04", "time": "10:00", "note": "Bus", "createdAt": "2026-01-04T10:00:00.000Z" },
+  { "type": "Expense", "amount": 38, "categoryId": 2, "subcategoryName": "Bus Ticket", "paymentMethod": "Cash", "date": "2026-01-04", "time": "10:00", "note": "Bus Ticket", "createdAt": "2026-01-04T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 498, "categoryId": 4, "subcategoryName": "Tiffin", "paymentMethod": "Cash", "date": "2026-01-05", "time": "10:00", "note": "Tiffin", "createdAt": "2026-01-05T10:00:00.000Z" },
+  { "type": "Expense", "amount": 35, "categoryId": 1, "subcategoryName": "Nasto (BREAKFAST)", "paymentMethod": "Cash", "date": "2026-01-05", "time": "10:00", "note": "Breakfast", "createdAt": "2026-01-05T10:00:00.000Z" },
+  { "type": "Expense", "amount": 80, "categoryId": 3, "subcategoryName": "Parcel", "paymentMethod": "Cash", "date": "2026-01-05", "time": "10:00", "note": "Parcel", "createdAt": "2026-01-05T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 10, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-06", "time": "10:00", "note": "Tea", "createdAt": "2026-01-06T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 300, "categoryId": 2, "subcategoryName": "Petrol", "paymentMethod": "Cash", "date": "2026-01-07", "time": "10:00", "note": "Petrol", "createdAt": "2026-01-07T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 30, "categoryId": 1, "subcategoryName": "Mazza", "paymentMethod": "Cash", "date": "2026-01-08", "time": "10:00", "note": "Mazza", "createdAt": "2026-01-08T10:00:00.000Z" },
+  { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Bournvita", "paymentMethod": "Cash", "date": "2026-01-08", "time": "10:00", "note": "Bournvita", "createdAt": "2026-01-08T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-09", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-09T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-10", "time": "10:00", "note": "Tea", "createdAt": "2026-01-10T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 30, "categoryId": 1, "subcategoryName": "Samosa", "paymentMethod": "Cash", "date": "2026-01-11", "time": "10:00", "note": "Samosa", "createdAt": "2026-01-11T10:00:00.000Z" },
+  { "type": "Expense", "amount": 70, "categoryId": 4, "subcategoryName": "DMART", "paymentMethod": "Cash", "date": "2026-01-11", "time": "10:00", "note": "DMART", "createdAt": "2026-01-11T10:00:00.000Z" },
+  { "type": "Expense", "amount": 11, "categoryId": 1, "subcategoryName": "Chass (Buttermilk)", "paymentMethod": "Cash", "date": "2026-01-11", "time": "10:00", "note": "Buttermilk", "createdAt": "2026-01-11T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Maska Bun", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Maska Bun", "createdAt": "2026-01-12T10:00:00.000Z" },
+  { "type": "Expense", "amount": 120, "categoryId": 1, "subcategoryName": "Pulav", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Pulav", "createdAt": "2026-01-12T10:00:00.000Z" },
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Kulfi", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Kulfi", "createdAt": "2026-01-12T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 100, "categoryId": 1, "subcategoryName": "Bhajya", "paymentMethod": "Cash", "date": "2026-01-13", "time": "10:00", "note": "Bhajya", "createdAt": "2026-01-13T10:00:00.000Z" },
+  { "type": "Expense", "amount": 200, "categoryId": 2, "subcategoryName": "Petrol", "paymentMethod": "Cash", "date": "2026-01-13", "time": "10:00", "note": "Petrol", "createdAt": "2026-01-13T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 500, "categoryId": 3, "subcategoryName": "Seva", "paymentMethod": "Cash", "date": "2026-01-14", "time": "10:00", "note": "Seva", "createdAt": "2026-01-14T10:00:00.000Z" },
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Faluda", "paymentMethod": "Cash", "date": "2026-01-14", "time": "10:00", "note": "Faluda", "createdAt": "2026-01-14T10:00:00.000Z" },
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-14", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-14T10:00:00.000Z" },
+  { "type": "Expense", "amount": 230, "categoryId": 1, "subcategoryName": "Riverfront + Dinner", "paymentMethod": "Cash", "date": "2026-01-14", "time": "10:00", "note": "Riverfront + Dinner", "createdAt": "2026-01-14T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Biscuit", "paymentMethod": "Cash", "date": "2026-01-15", "time": "10:00", "note": "Biscuit", "createdAt": "2026-01-15T10:00:00.000Z" },
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea (Chai)", "paymentMethod": "Cash", "date": "2026-01-15", "time": "10:00", "note": "Tea", "createdAt": "2026-01-15T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-16", "time": "10:00", "note": "Tea", "createdAt": "2026-01-16T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 200, "categoryId": 3, "subcategoryName": "Aryan", "paymentMethod": "Cash", "date": "2026-01-17", "time": "10:00", "note": "Aryan", "createdAt": "2026-01-17T10:00:00.000Z" },
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-17", "time": "10:00", "note": "Tea", "createdAt": "2026-01-17T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 200, "categoryId": 8, "subcategoryName": "Mobile Glasses", "paymentMethod": "Cash", "date": "2026-01-18", "time": "10:00", "note": "Mobile Glasses", "createdAt": "2026-01-18T10:00:00.000Z" },
+  { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-18", "time": "10:00", "note": "Tea", "createdAt": "2026-01-18T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 60, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-19", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-19T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 55, "categoryId": 1, "subcategoryName": "Thepla & Chai", "paymentMethod": "Cash", "date": "2026-01-20", "time": "10:00", "note": "Thepla & Chai", "createdAt": "2026-01-20T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Orange Fruits", "paymentMethod": "Cash", "date": "2026-01-21", "time": "10:00", "note": "Orange Fruits", "createdAt": "2026-01-21T10:00:00.000Z" },
+  { "type": "Expense", "amount": 140, "categoryId": 1, "subcategoryName": "Ice Cream", "paymentMethod": "Cash", "date": "2026-01-21", "time": "10:00", "note": "Ice Cream", "createdAt": "2026-01-21T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 45, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-22", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-22T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Maska Bun", "paymentMethod": "Cash", "date": "2026-01-23", "time": "10:00", "note": "Maska Bun", "createdAt": "2026-01-23T10:00:00.000Z" },
+  { "type": "Expense", "amount": 50, "categoryId": 1, "subcategoryName": "Aloo Paratha", "paymentMethod": "Cash", "date": "2026-01-23", "time": "10:00", "note": "Aloo Paratha", "createdAt": "2026-01-23T10:00:00.000Z" },
+  { "type": "Expense", "amount": 95, "categoryId": 2, "subcategoryName": "Train Ticket to Surat", "paymentMethod": "Cash", "date": "2026-01-23", "time": "10:00", "note": "General Train Ticket", "createdAt": "2026-01-23T10:00:00.000Z" },
+  { "type": "Expense", "amount": 15, "categoryId": 2, "subcategoryName": "Metro", "paymentMethod": "Cash", "date": "2026-01-23", "time": "10:00", "note": "Metro", "createdAt": "2026-01-23T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 80, "categoryId": 1, "subcategoryName": "Gold Dudh", "paymentMethod": "Cash", "date": "2026-01-24", "time": "10:00", "note": "Gold Dudh", "createdAt": "2026-01-24T10:00:00.000Z" },
+  { "type": "Expense", "amount": 114, "categoryId": 1, "subcategoryName": "Paneer & Curd", "paymentMethod": "Cash", "date": "2026-01-24", "time": "10:00", "note": "Paneer & Curd", "createdAt": "2026-01-24T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 130, "categoryId": 1, "subcategoryName": "Sigapuri Rice", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "Sigapuri Rice", "createdAt": "2026-01-25T10:00:00.000Z" },
+  { "type": "Expense", "amount": 60, "categoryId": 1, "subcategoryName": "Chai", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "Chai", "createdAt": "2026-01-25T10:00:00.000Z" },
+  { "type": "Expense", "amount": 363, "categoryId": 2, "subcategoryName": "CNG Gas", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "CNG Gas", "createdAt": "2026-01-25T10:00:00.000Z" },
+  { "type": "Expense", "amount": 290, "categoryId": 1, "subcategoryName": "Underwear", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "Underwear", "createdAt": "2026-01-25T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 158, "categoryId": 4, "subcategoryName": "Perfume", "paymentMethod": "Cash", "date": "2026-01-26", "time": "10:00", "note": "Perfume", "createdAt": "2026-01-26T10:00:00.000Z" },
+  { "type": "Expense", "amount": 110, "categoryId": 2, "subcategoryName": "General Ticket", "paymentMethod": "Cash", "date": "2026-01-26", "time": "10:00", "note": "General Ticket", "createdAt": "2026-01-26T10:00:00.000Z" },
+  { "type": "Expense", "amount": 150, "categoryId": 3, "subcategoryName": "Haircut", "paymentMethod": "Cash", "date": "2026-01-26", "time": "10:00", "note": "Haircut", "createdAt": "2026-01-26T10:00:00.000Z" },
+  { "type": "Expense", "amount": 84, "categoryId": 4, "subcategoryName": "Parcel", "paymentMethod": "Cash", "date": "2026-01-26", "time": "10:00", "note": "Parcel", "createdAt": "2026-01-26T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 150, "categoryId": 2, "subcategoryName": "Petrol", "paymentMethod": "Cash", "date": "2026-01-27", "time": "10:00", "note": "Petrol", "createdAt": "2026-01-27T10:00:00.000Z" },
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Biscuit", "paymentMethod": "Cash", "date": "2026-01-27", "time": "10:00", "note": "Biscuit", "createdAt": "2026-01-27T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-28", "time": "10:00", "note": "Tea", "createdAt": "2026-01-28T10:00:00.000Z" },
+  { "type": "Expense", "amount": 45, "categoryId": 1, "subcategoryName": "Tea & Nasto", "paymentMethod": "Cash", "date": "2026-01-28", "time": "10:00", "note": "Tea & Nasto", "createdAt": "2026-01-28T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Wafer", "paymentMethod": "Cash", "date": "2026-01-29", "time": "10:00", "note": "Wafer", "createdAt": "2026-01-29T10:00:00.000Z" },
+  { "type": "Expense", "amount": 10, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-29", "time": "10:00", "note": "Tea", "createdAt": "2026-01-29T10:00:00.000Z" },
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Wafer", "paymentMethod": "Cash", "date": "2026-01-29", "time": "10:00", "note": "Wafer", "createdAt": "2026-01-29T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-30", "time": "10:00", "note": "Tea", "createdAt": "2026-01-30T10:00:00.000Z" },
+  { "type": "Expense", "amount": 25, "categoryId": 1, "subcategoryName": "Vadapav", "paymentMethod": "Cash", "date": "2026-01-30", "time": "10:00", "note": "Vadapav", "createdAt": "2026-01-30T10:00:00.000Z" },
+  { "type": "Expense", "amount": 10, "categoryId": 1, "subcategoryName": "Chocolate", "paymentMethod": "Cash", "date": "2026-01-30", "time": "10:00", "note": "Chocolate", "createdAt": "2026-01-30T10:00:00.000Z" },
+  { "type": "Expense", "amount": 50, "categoryId": 3, "subcategoryName": "Xerox", "paymentMethod": "Cash", "date": "2026-01-30", "time": "10:00", "note": "Xerox", "createdAt": "2026-01-30T10:00:00.000Z" },
+  { "type": "Expense", "amount": 15, "categoryId": 2, "subcategoryName": "Metro", "paymentMethod": "Cash", "date": "2026-01-30", "time": "10:00", "note": "Metro", "createdAt": "2026-01-30T10:00:00.000Z" },
+
+  { "type": "Expense", "amount": 110, "categoryId": 2, "subcategoryName": "Nadiad", "paymentMethod": "Cash", "date": "2026-01-31", "time": "10:00", "note": "Nadiad", "createdAt": "2026-01-31T10:00:00.000Z" },
+  { "type": "Expense", "amount": 60, "categoryId": 1, "subcategoryName": "Cake", "paymentMethod": "Cash", "date": "2026-01-31", "time": "10:00", "note": "Cake", "createdAt": "2026-01-31T10:00:00.000Z" }
+]

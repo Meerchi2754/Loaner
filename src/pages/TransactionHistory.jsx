@@ -1,37 +1,90 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { db } from "../db/appDB";
 import { useLiveQuery } from "dexie-react-hooks";
 import BottomNav from "../component/BottomNav";
+import { defaultCategories } from "../model/category";
+import { useSelector } from "react-redux";
 
 const TransactionHistory = () => {
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
 
-  // 🔥 Live reactive data from Dexie
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [jsonTransactions, setJsonTransactions] = useState([]);
+
+  /* -------------------- LIVE DEXIE DATA -------------------- */
   const transactions = useLiveQuery(() => db.transactions.toArray(), []);
-  const categories = useLiveQuery(() => db.categories.toArray(), []);
+  const categories = useSelector((state) => state.category.categories || []);
 
-  // ✅ Safe fallback for transactions and categories
   const safeTransactions = transactions ?? [];
-  const safeCategories = categories ?? [];
+  const safeCategories =
+    categories && categories.length > 0 ? categories : defaultCategories;
 
-  // 🔥 Create category lookup map (O(1) access)
+  /* -------------------- LOAD JSON FOR OLD MONTH -------------------- */
+  useEffect(() => {
+    const loadPreviousMonthData = async () => {
+      if (selectedMonth === currentMonth) {
+        setJsonTransactions([]);
+        return;
+      }
+
+      try {
+        const monthString = String(selectedMonth).padStart(2, "0");
+
+        // IMPORTANT: JSON must be inside public/Data/
+        const response = await fetch(
+          `/Data/${currentYear}-${monthString}.json`,
+        );
+
+        if (!response.ok) throw new Error("No JSON file found");
+
+        const data = await response.json();
+        setJsonTransactions(data);
+      } catch (error) {
+        console.log("No JSON file available for this month");
+        setJsonTransactions([]);
+      }
+    };
+
+    loadPreviousMonthData();
+  }, [selectedMonth, currentMonth, currentYear]);
+
+  /* -------------------- CATEGORY MAP (FIXED ICON BUG) -------------------- */
   const categoryMap = useMemo(() => {
     const map = {};
     safeCategories.forEach((cat) => {
-      map[cat.id] = cat;
+      map[String(cat.id)] = cat; // Normalize key as string
     });
     return map;
   }, [safeCategories]);
 
-  // 🔥 Filter by selected month
-  const filteredTransactions = useMemo(() => {
-    return safeTransactions.filter((tx) => {
-      const txDate = new Date(tx.date || tx.createdAt);
-      return txDate.getMonth() + 1 === selectedMonth;
-    });
-  }, [safeTransactions, selectedMonth]);
+  const getCategory = (categoryId) => {
+    return categoryMap[String(categoryId)] || null;
+  };
 
-  // 🔥 Totals
+  /* -------------------- FILTER TRANSACTIONS -------------------- */
+  const filteredTransactions = useMemo(() => {
+    if (selectedMonth === currentMonth) {
+      return safeTransactions.filter((tx) => {
+        const txDate = new Date(tx.date || tx.createdAt);
+        return (
+          txDate.getMonth() + 1 === selectedMonth &&
+          txDate.getFullYear() === currentYear
+        );
+      });
+    }
+
+    return jsonTransactions;
+  }, [
+    safeTransactions,
+    jsonTransactions,
+    selectedMonth,
+    currentMonth,
+    currentYear,
+  ]);
+
+  /* -------------------- TOTALS -------------------- */
   const totalExpense = useMemo(() => {
     return filteredTransactions
       .filter((tx) => tx.type === "Expense")
@@ -44,7 +97,7 @@ const TransactionHistory = () => {
       .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
   }, [filteredTransactions]);
 
-  // 🔥 Group by Date
+  /* -------------------- GROUP BY DATE -------------------- */
   const groupedByDate = useMemo(() => {
     const groups = {};
     const today = new Date().toISOString().slice(0, 10);
@@ -67,7 +120,7 @@ const TransactionHistory = () => {
       groups[label].push(tx);
     }
 
-    // Sort each day by time descending
+    // Sort each group by time (descending)
     Object.values(groups).forEach((arr) =>
       arr.sort((a, b) => {
         const ta = (a.time ?? "00:00").replace(":", "");
@@ -115,7 +168,7 @@ const TransactionHistory = () => {
         </select>
       </div>
 
-      {/* Totals Card */}
+      {/* Totals */}
       <div className="flex justify-between items-center bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-4 rounded-lg shadow-md mb-4">
         <div>
           <p className="text-sm text-gray-400">Total Income</p>
@@ -143,36 +196,33 @@ const TransactionHistory = () => {
             </h3>
 
             <ul className="space-y-4">
-              {groupedByDate.groups[label].map((t) => {
-                const category = categoryMap[t.categoryId];
+              {groupedByDate.groups[label].map((t, index) => {
+                const category = getCategory(t.categoryId);
 
                 return (
                   <li
-                    key={t.id}
+                    key={t.id ?? index}
                     className="flex items-center justify-between rounded-2xl shadow-lg bg-gray-800 p-4"
                   >
                     <div className="flex items-center gap-4">
-                      {/* Icon */}
                       <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-700">
                         <span className="text-xl text-white">
-                          {category?.icon ?? "🍔"}
+                          {category?.icon ?? "📦"}
                         </span>
                       </div>
 
-                      {/* Details */}
                       <div>
                         <p className="text-sm font-semibold">
                           {t.subcategoryName}
                         </p>
 
                         <p className="text-xs text-gray-400">
-                          {category?.name ?? `Category ${t.categoryId ?? "?"}`}{" "}
-                          • {t.paymentMethod}
+                          {category?.name ?? "Unknown"} •{" "}
+                          {t.paymentMethod ?? "N/A"}
                         </p>
                       </div>
                     </div>
 
-                    {/* Amount */}
                     <div className="text-right">
                       <p
                         className={`text-sm font-bold ${
@@ -182,7 +232,7 @@ const TransactionHistory = () => {
                         }`}
                       >
                         {t.type === "Income" ? "+" : "-"}₹
-                        {Number(t.amount).toFixed(2)}
+                        {Number(t.amount || 0).toFixed(2)}
                       </p>
 
                       <p className="text-xs text-gray-400">{t.time ?? "N/A"}</p>

@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../db/appDB";
+import { useDispatch, useSelector } from "react-redux";
+import { addCategories } from "../features/categorySlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 export default function AddTransaction() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const categories = useSelector((state) => state.category.categories);
 
   const [type, setType] = useState("Expense");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("GPAY"); // Default payment method
-
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-
   const [categoryId, setCategoryId] = useState("");
-  const [subcategoriesId, setSubcategoriesId] = useState("");
-  const [subcategoryName, setSubcategoryName] = useState("");
+  const [subcategories, setSubcategories] = useState([]);
+  // const [subcategoriesId, setSubcategoriesId] = useState("");
+  //const [subcategoryName, setSubcategoryName] = useState("");
 
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10)); // "YYYY-MM-DD"
   const [time, setTime] = useState(() => new Date().toTimeString().slice(0, 5)); // "HH:MM"
@@ -24,30 +25,27 @@ export default function AddTransaction() {
   const [isRecurring, setIsRecurring] = useState(false); // State for recurring transactions
   const [isLoading, setIsLoading] = useState(false); // Loading state for save button
 
-  useEffect(() => {
-    async function loadCategories() {
-      const data = await db.categories.toArray();
-      setCategories(data);
-    }
-    loadCategories();
-  }, []);
+  // useEffect(() => {
+  //   async function loadSubcategories() {
+  //     if (!categoryId || isNaN(Number(categoryId))) {
+  //       //console.error("Invalid categoryId:", categoryId);
+  //       setSubcategories([]);
+  //       return;
+  //     }
 
-  useEffect(() => {
-    async function loadSubcategories() {
-      if (!categoryId) {
-        setSubcategories([]);
-        setSubcategoriesId("");
-        return;
-      }
-      const data = await db.subcategories
-        .where("categoryId")
-        .equals(Number(categoryId))
-        .toArray();
+  //     try {
+  //       const data = await db.subcategories
+  //         .where("categoryId")
+  //         .equals(Number(categoryId))
+  //         .toArray();
+  //       setSubcategories(data);
+  //     } catch (error) {
+  //       console.error("Failed to load subcategories:", error);
+  //     }
+  //   }
 
-      setSubcategories(data);
-    }
-    loadSubcategories();
-  }, [categoryId]);
+  //   loadSubcategories();
+  // }, [categoryId]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -66,8 +64,9 @@ export default function AddTransaction() {
       type,
       amount: Number(amount),
       categoryId: Number(categoryId),
-      subcategoriesId: subcategoriesId ? Number(subcategoriesId) : null,
-      subcategoryName: subcategoryName ? subcategoryName.trim() : null,
+      // subcategoriesId: subcategoriesId ? Number(subcategoriesId) : null,
+      // subcategoryName: subcategoryName ? subcategoryName.trim() : null,
+      subcategories,
       paymentMethod,
       date,
       time,
@@ -83,8 +82,9 @@ export default function AddTransaction() {
       navigate("/home");
       setAmount("");
       setNote("");
-      setSubcategoriesId("");
-      setSubcategoryName("");
+      setSubcategories("");
+      // setSubcategoriesId("");
+      // setSubcategoryName("");
     } catch (error) {
       toast.error("Failed to save transaction. Please try again.");
     } finally {
@@ -150,7 +150,16 @@ export default function AddTransaction() {
               />
             </div>
           </div>
-
+         
+          <div>
+            <label>Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
+            />
+          </div>
           {/* Category */}
           <div>
             <label className="block text-sm text-gray-300 mb-2">Category</label>
@@ -191,14 +200,15 @@ export default function AddTransaction() {
               SubCategory
             </label>
             <textarea
-              value={subcategoryName}
-              onChange={(e) => setSubcategoryName(e.target.value)}
-              placeholder={
-                categoryId
-                  ? "Enter subcategory name (optional)"
-                  : "Select a category first"
-              }
-              disabled={!categoryId}
+              value={subcategories}
+              onChange={(e) => setSubcategories(e.target.value)}
+              // placeholder={
+              //   categoryId
+              //     ? "Enter subcategory name (optional)"
+              //     : "Select a category first"
+              // }
+              // disabled={!categoryId}
+              placeholder="Enter subcategory name (optional)"
               rows={2}
               className="w-full bg-gray-700 text-white rounded-lg p-3 border border-gray-600 resize-none focus:outline-none placeholder-gray-400"
             />
@@ -218,7 +228,7 @@ export default function AddTransaction() {
             />
           </div>
 
-          {/* Recurring checkbox */}
+          {/* Recurring checkbox
           <div className="flex items-center gap-2">
             <input
               id="recurring"
@@ -230,7 +240,7 @@ export default function AddTransaction() {
             <label htmlFor="recurring" className="text-sm text-gray-300">
               Recurring transaction
             </label>
-          </div>
+          </div> */}
 
           {/* Save button */}
           <div>
