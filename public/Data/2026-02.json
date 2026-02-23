@@ -1,0 +1,6 @@
+[
+{ "type": "Income", "amount": 500, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-02-02", "time": "12:53", "note": "Meetraj", "createdAt": "2026-02-02T12:53:10.231Z" },
+{ "type": "Income", "amount": 17000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-02-07", "time": "19:21", "note": "Meetraj", "createdAt": "2026-02-07T19:21:53.000Z" },
+{ "type": "Income", "amount":1400, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-02-15", "time": "12:20", "note": "Meetraj", "createdAt": "2026-02-15T12:20:49.000Z" },
+{ "type": "Income", "amount":1000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-02-22", "time": "20:33", "note": "Meetraj", "createdAt": "2026-02-22T20:33:23.000Z" }
+]

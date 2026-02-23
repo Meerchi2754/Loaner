@@ -5,7 +5,12 @@
   { "type": "Expense", "amount": 100, "categoryId": 2, "subcategoryName": "Petrol", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Petrol", "createdAt": "2026-01-02T10:00:00.000Z" },
   { "type": "Expense", "amount": 14, "categoryId": 7, "subcategoryName": "Xerox", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Xerox", "createdAt": "2026-01-02T10:00:00.000Z" },
   { "type": "Expense", "amount": 100, "categoryId": 1, "subcategoryName": "Milk", "paymentMethod": "Cash", "date": "2026-01-02", "time": "10:00", "note": "Milk", "createdAt": "2026-01-02T10:00:00.000Z" },
-
+  { "type": "Income", "amount": 2000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-03", "time": "21:00", "note": "", "createdAt": "2026-01-02T21:54:00.000Z" },
+  
+  
+  { "type": "Income", "amount": 36000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-03", "time": "20:00", "note": "College 8th Sem", "createdAt": "2026-01-03T20:00:00.000Z" },
+  { "type": "Income", "amount": 15000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-03", "time": "20:00", "note": "College 8th Sem", "createdAt": "2026-01-03T20:00:00.000Z" },
+  { "type": "Expense", "amount": 51000, "categoryId": 3, "subcategoryName": "College 8th Sem", "paymentMethod": "GPAY", "date": "2026-01-03", "time": "21:00", "note": "College 8th Sem", "createdAt": "2026-01-03T21:00:00.000Z" },
   { "type": "Expense", "amount": 250, "categoryId": 2, "subcategoryName": "Auto Rickshaw", "paymentMethod": "Cash", "date": "2026-01-03", "time": "10:00", "note": "Auto Rickshaw", "createdAt": "2026-01-03T10:00:00.000Z" },
   { "type": "Expense", "amount": 90, "categoryId": 1, "subcategoryName": "Wafer", "paymentMethod": "Cash", "date": "2026-01-03", "time": "10:00", "note": "Wafer", "createdAt": "2026-01-03T10:00:00.000Z" },
 
@@ -32,6 +37,7 @@
   { "type": "Expense", "amount": 70, "categoryId": 4, "subcategoryName": "DMART", "paymentMethod": "Cash", "date": "2026-01-11", "time": "10:00", "note": "DMART", "createdAt": "2026-01-11T10:00:00.000Z" },
   { "type": "Expense", "amount": 11, "categoryId": 1, "subcategoryName": "Chass (Buttermilk)", "paymentMethod": "Cash", "date": "2026-01-11", "time": "10:00", "note": "Buttermilk", "createdAt": "2026-01-11T10:00:00.000Z" },
 
+   { "type": "Income", "amount": 2000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-12", "time": "20:08", "note": "", "createdAt": "2026-01-12T20:08:10.648Z" },
   { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Maska Bun", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Maska Bun", "createdAt": "2026-01-12T10:00:00.000Z" },
   { "type": "Expense", "amount": 120, "categoryId": 1, "subcategoryName": "Pulav", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Pulav", "createdAt": "2026-01-12T10:00:00.000Z" },
   { "type": "Expense", "amount": 20, "categoryId": 1, "subcategoryName": "Kulfi", "paymentMethod": "Cash", "date": "2026-01-12", "time": "10:00", "note": "Kulfi", "createdAt": "2026-01-12T10:00:00.000Z" },
@@ -55,6 +61,7 @@
   { "type": "Expense", "amount": 200, "categoryId": 8, "subcategoryName": "Mobile Glasses", "paymentMethod": "Cash", "date": "2026-01-18", "time": "10:00", "note": "Mobile Glasses", "createdAt": "2026-01-18T10:00:00.000Z" },
   { "type": "Expense", "amount": 40, "categoryId": 1, "subcategoryName": "Tea", "paymentMethod": "Cash", "date": "2026-01-18", "time": "10:00", "note": "Tea", "createdAt": "2026-01-18T10:00:00.000Z" },
 
+  { "type": "Income", "amount": 500, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-19", "time": "20:08", "note": "College 8th Sem", "createdAt": "2026-01-19T20:08:00.000Z" },
   { "type": "Expense", "amount": 60, "categoryId": 1, "subcategoryName": "Nasto", "paymentMethod": "Cash", "date": "2026-01-19", "time": "10:00", "note": "Nasto", "createdAt": "2026-01-19T10:00:00.000Z" },
 
   { "type": "Expense", "amount": 55, "categoryId": 1, "subcategoryName": "Thepla & Chai", "paymentMethod": "Cash", "date": "2026-01-20", "time": "10:00", "note": "Thepla & Chai", "createdAt": "2026-01-20T10:00:00.000Z" },
@@ -72,6 +79,7 @@
   { "type": "Expense", "amount": 80, "categoryId": 1, "subcategoryName": "Gold Dudh", "paymentMethod": "Cash", "date": "2026-01-24", "time": "10:00", "note": "Gold Dudh", "createdAt": "2026-01-24T10:00:00.000Z" },
   { "type": "Expense", "amount": 114, "categoryId": 1, "subcategoryName": "Paneer & Curd", "paymentMethod": "Cash", "date": "2026-01-24", "time": "10:00", "note": "Paneer & Curd", "createdAt": "2026-01-24T10:00:00.000Z" },
 
+   { "type": "Income", "amount": 1000, "categoryId": 9, "subcategoryName": "Papa", "paymentMethod": "GPAY", "date": "2026-01-03", "time": "11:48", "note": "", "createdAt": "2026-01-25T11:48:45.947Z" },
   { "type": "Expense", "amount": 130, "categoryId": 1, "subcategoryName": "Sigapuri Rice", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "Sigapuri Rice", "createdAt": "2026-01-25T10:00:00.000Z" },
   { "type": "Expense", "amount": 60, "categoryId": 1, "subcategoryName": "Chai", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "Chai", "createdAt": "2026-01-25T10:00:00.000Z" },
   { "type": "Expense", "amount": 363, "categoryId": 2, "subcategoryName": "CNG Gas", "paymentMethod": "Cash", "date": "2026-01-25", "time": "10:00", "note": "CNG Gas", "createdAt": "2026-01-25T10:00:00.000Z" },

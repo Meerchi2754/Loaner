@@ -5,15 +5,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { jsPDF } from "jspdf";
 import { db } from "../db/appDB";
 import { passwordChanger } from "../features/userSlice";
+import { useLiveQuery } from "dexie-react-hooks";
 import { addCategories } from "../features/categorySlice";
 
 export default function Settings() {
   const dispatch = useDispatch();
-  const transactions = useSelector(
-    (state) => state.transaction.transactions || [],
-  );
+  const transactions = useLiveQuery(() => db.transactions.toArray(), []);
+
   const currentTheme = useSelector((state) => state.user.theme); // Get the current theme
   const currentMonth = new Date().getMonth(); // Get the current month (0-indexed)
+  const currentMonthString = new Date().toLocaleString("default", {
+    month: "long",
+  }); // Get the current month as a string
   const currentPassword = useSelector((state) => state.user.password);
   const password = useSelector((state) => state.user.password);
   const categories = useSelector((state) => state.category.categories || []); // Fetch categories from Redux
@@ -29,9 +32,9 @@ export default function Settings() {
   // Handle Export to PDF
   const handleExportToPDF = () => {
     const doc = new jsPDF();
-    doc.setFontSize(16);
+    doc.setFontSize(8);
     doc.text("Transaction History", 10, 10);
-
+    console.log(doc);
     // Filter transactions for the current month
     const filteredTransactions = transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
@@ -42,12 +45,12 @@ export default function Settings() {
       toast.error("No transactions found for the current month.");
       return;
     }
-
+    console.log("Filtered Transactions:", filteredTransactions);
     // Add transactions to the PDF
     let y = 20;
     filteredTransactions.forEach((transaction, index) => {
       doc.text(
-        `${index + 1}. ${transaction.date} - ${transaction.description} - ₹${transaction.amount}`,
+        `${index + 1}) ${transaction.type}: ${transaction.date} - ${transaction.subcategories} - Rs.${transaction.amount}`,
         10,
         y,
       );
@@ -55,7 +58,7 @@ export default function Settings() {
     });
 
     // Save the PDF
-    doc.save("Transaction_History.pdf");
+    doc.save(`${currentMonthString}_Hisab.pdf`);
     toast.success("Transaction history exported to PDF!");
   };
 

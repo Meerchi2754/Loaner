@@ -7,5 +7,6 @@ export const defaultCategories = [
   { id: 6, name: "Rapido", icon: "🛵" },
   { id: 7, name: "Others", icon: "📦" },
   { id: 8, name: "Service", icon: "🛠️" },
-  // { id: 9, name: "Rahul", icon: "😁" },
+  { id: 9, name: "Papa", icon: "😁" },
+  { id: 10, name: "Aryan", icon: "😎" },
 ];
