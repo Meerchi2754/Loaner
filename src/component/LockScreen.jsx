@@ -105,7 +105,7 @@ const LockScreen = () => {
               onChange={(e) => handlePinInput(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gray-800 border border-gray-700 rounded-xl text-white text-center text-lg sm:text-xl font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition"
-              placeholder="•"
+              placeholder=""
             />
           ))}
         </div>

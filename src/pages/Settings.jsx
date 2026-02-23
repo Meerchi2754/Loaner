@@ -4,14 +4,16 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { jsPDF } from "jspdf";
 import { db } from "../db/appDB";
-import { passwordChanger } from "../features/userSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { addCategories } from "../features/categorySlice";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Settings() {
+  const navigate=useNavigate();
   const dispatch = useDispatch();
   const transactions = useLiveQuery(() => db.transactions.toArray(), []);
-
+  const [showResetModal, setShowResetModal] = useState(false);
   const currentTheme = useSelector((state) => state.user.theme); // Get the current theme
   const currentMonth = new Date().getMonth(); // Get the current month (0-indexed)
   const currentMonthString = new Date().toLocaleString("default", {
@@ -59,6 +61,8 @@ export default function Settings() {
   const handleResetTransactions = () => {
     db.transactions.clear();
     toast.success("All transactions have been reset!");
+    setShowResetModal(false);
+    navigate("/home");
   };
 
   // export to JSON
@@ -121,6 +125,7 @@ export default function Settings() {
       setIsAddingCategory(false);
       setNewCategoryName("");
       setNewCategoryIcon("");
+      setShowResetModal(false);
     } catch (error) {
       console.error(error);
       toast.error("Failed to add category");
@@ -158,12 +163,18 @@ export default function Settings() {
           </div>
 
           {/* Reset Database Transactions */}
-          <div className="bg-gray-800 p-4 rounded-lg shadow-md">
+          <div
+            className={`bg-gray-800 rounded-lg shadow-md ${
+              currentTheme === "dark"
+                ? "bg-[#121212] text-white"
+                : "bg-white text-black"
+            } p-4 ${showResetModal ? "blur-sm pointer-events-none" : ""}`}
+          >
             <h3 className="text-lg font-semibold text-gray-300 mb-2">
               Reset Transactions
             </h3>
             <button
-              onClick={handleResetTransactions}
+              onClick={() => setShowResetModal(true)}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition duration-200"
             >
               Reset Database
@@ -285,7 +296,38 @@ export default function Settings() {
           </div>
         </div>
       </div>
+      {showResetModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
+          {/* Modal Box */}
+          <div className="relative bg-gray-800 text-white p-6 rounded-2xl shadow-lg w-80 z-50">
+            <h2 className="text-lg font-bold mb-4 text-center">
+              Are you sure?
+            </h2>
+            <p className="text-sm text-gray-300 mb-6 text-center">
+              You wanna reset all transactions?
+            </p>
+
+            <div className="flex justify-between gap-4">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="w-full bg-gray-600 hover:bg-gray-700 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleResetTransactions}
+                className="w-full bg-red-500 hover:bg-red-600 py-2 rounded-lg"
+              >
+                Yes, Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Bottom Navigation */}
       <BottomNav />
     </>
