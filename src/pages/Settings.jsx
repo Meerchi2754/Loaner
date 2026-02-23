@@ -70,32 +70,25 @@ export default function Settings() {
         toast.error("No transactions found to export.");
         return;
       }
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
+          const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
 
-      const fileName = `${year}-${month}.json`;
+    const fileName = `${year}-${month}.json`;
 
-      const jsonData = JSON.stringify(allTransactions, null, 2);
+    const jsonData = JSON.stringify(allTransactions, null, 2);
 
-      const dirHandle = await window.showDirectoryPicker();
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
 
-      const fileHandle = await dirHandle.getFileHandle(fileName, {
-        create: true,
-      });
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
 
-      const writable = await fileHandle.createWritable();
-      await writable.write(jsonData);
-      await writable.close();
+    URL.revokeObjectURL(url);
 
-      // const a = document.createElement("a");
-      // a.href = url;
-      // a.download = fileName;
-      // a.click();
-
-      // URL.revokeObjectURL(url);
-
-      toast.success("Transactions exported successfully!");
+    toast.success("Transactions exported successfully!");
     } catch (error) {
       console.error("Error exporting to JSON:", error);
       toast.error("Failed to export transactions to JSON");
