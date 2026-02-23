@@ -17,17 +17,10 @@ export default function Settings() {
   const currentMonthString = new Date().toLocaleString("default", {
     month: "long",
   }); // Get the current month as a string
-  const currentPassword = useSelector((state) => state.user.password);
-  const password = useSelector((state) => state.user.password);
   const categories = useSelector((state) => state.category.categories || []); // Fetch categories from Redux
   const [isAddingCategory, setIsAddingCategory] = useState(false); // Toggle for Add Category
   const [newCategoryName, setNewCategoryName] = useState(""); // State for category name
   const [newCategoryIcon, setNewCategoryIcon] = useState(""); // State for category icon
-  useEffect(() => {
-    console.log("Updated password:", password);
-  }, [password]); // Get the current password
-  const [isChangingPassword, setIsChangingPassword] = useState(false); // State to toggle password input
-  const [newPassword, setNewPassword] = useState(""); // State to store the new password
 
   // Handle Export to PDF
   const handleExportToPDF = () => {
@@ -68,17 +61,38 @@ export default function Settings() {
     toast.success("All transactions have been reset!");
   };
 
-  // Handle Change Password
-  const handlePasswordChange = () => {
-    if (newPassword.trim().length < 4) {
-      toast.error("Password must be at least 4 characters long.");
-      return;
-    }
+  // export to JSON
+  const exportToJSON = async () => {
+    try {
+      const allTransactions = await db.transactions.toArray();
 
-    dispatch(passwordChanger({ password: newPassword })); // Dispatch the new password
-    toast.success("Password changed successfully!");
-    setIsChangingPassword(false); // Hide the input field
-    setNewPassword(""); // Clear the input field
+      if (allTransactions.length === 0) {
+        toast.error("No transactions found to export.");
+        return;
+      }
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+
+      const fileName = `${year}-${month}.json`;
+
+      const jsonData = JSON.stringify(allTransactions, null, 2);
+
+      const blob = new Blob([jsonData], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+
+      URL.revokeObjectURL(url);
+
+      toast.success("Transactions exported successfully!");
+    } catch (error) {
+      console.error("Error exporting to JSON:", error);
+      toast.error("Failed to export transactions to JSON");
+    }
   };
   const handleAddCategory = async () => {
     // if (!newCategoryName.trim() || !newCategoryIcon.trim()) {
@@ -156,10 +170,10 @@ export default function Settings() {
             </button>
           </div>
 
-          {/* Change Password */}
+          {/* Change Password
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-300 mb-2">
-              Change Password
+              Export to JSON
             </h3>
             {isChangingPassword ? (
               <div className="flex flex-col gap-4">
@@ -171,10 +185,10 @@ export default function Settings() {
                   className="w-full p-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
-                  onClick={handlePasswordChange}
+                  onClick={exportToJSON}
                   className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-200"
                 >
-                  Save Password
+                  Export to JSON
                 </button>
                 <button
                   onClick={() => {
@@ -194,7 +208,21 @@ export default function Settings() {
                 Change Password
               </button>
             )}
+          </div> */}
+
+          {/* Export to JSON*/}
+          <div className="bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-300 mb-2">
+              Export to JSON
+            </h3>
+            <button
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-200"
+              onClick={exportToJSON}
+            >
+              Export to JSON
+            </button>
           </div>
+
           {/* Add Category */}
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-300 mb-2">
