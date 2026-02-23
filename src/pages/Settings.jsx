@@ -78,15 +78,22 @@ export default function Settings() {
 
       const jsonData = JSON.stringify(allTransactions, null, 2);
 
-      const blob = new Blob([jsonData], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const dirHandle = await window.showDirectoryPicker();
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
+      const fileHandle = await dirHandle.getFileHandle(fileName, {
+        create: true,
+      });
 
-      URL.revokeObjectURL(url);
+      const writable = await fileHandle.createWritable();
+      await writable.write(jsonData);
+      await writable.close();
+
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = fileName;
+      // a.click();
+
+      // URL.revokeObjectURL(url);
 
       toast.success("Transactions exported successfully!");
     } catch (error) {
