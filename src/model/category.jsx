@@ -1,6 +1,7 @@
 export const defaultCategories = [
   { id: 1, name: "Food", icon: "🍔" },
   { id: 2, name: "Travel", icon: "✈️" },
+  { id: 11, name: "Petrol", icon: "⛽" },
   { id: 3, name: "Bills", icon: "💡" },
   { id: 4, name: "Shopping", icon: "🛍️" },
   { id: 5, name: "Salary", icon: "💰" },

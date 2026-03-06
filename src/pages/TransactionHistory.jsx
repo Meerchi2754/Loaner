@@ -5,6 +5,31 @@ import BottomNav from "../component/BottomNav";
 import { defaultCategories } from "../model/category";
 import { useSelector } from "react-redux";
 
+// ── Same category color map as Stats.jsx ────────────────────────────────────
+const CATEGORY_COLORS = {
+  1: "#F97316", // Food
+  2: "#60A5FA", // Travel
+  11: "#A78BFA", // Petrol
+  3: "#FBBF24", // Bills
+  4: "#F43F5E", // Shopping
+  5: "#34D399", // Salary
+  6: "#FB7185", // Rapido
+  7: "#94A3B8", // Others
+  8: "#38BDF8", // Service
+  9: "#22C55E", // Papa
+  10: "#E879F9", // Aryan
+};
+
+const MONTHS = Array.from({ length: 12 }, (_, i) =>
+  new Date(0, i).toLocaleString("default", { month: "long" }),
+);
+
+const fmt = (n) =>
+  Number(n).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 const TransactionHistory = () => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -13,68 +38,53 @@ const TransactionHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [jsonTransactions, setJsonTransactions] = useState([]);
 
-  /* -------------------- LIVE DEXIE DATA -------------------- */
   const transactions = useLiveQuery(() => db.transactions.toArray(), []);
   const categories = useSelector((state) => state.category.categories || []);
 
   const safeTransactions = transactions ?? [];
-  const safeCategories =
-    categories && categories.length > 0 ? categories : defaultCategories;
+  const safeCategories = categories?.length ? categories : defaultCategories;
 
-  /* -------------------- LOAD JSON FOR OLD MONTH -------------------- */
+  /* ── Load JSON for past months ─────────────────────────────────────────── */
   useEffect(() => {
-    const loadPreviousMonthData = async () => {
-      if (selectedMonth === currentMonth) {
-        setJsonTransactions([]);
-        return;
-      }
-
+    if (selectedMonth === currentMonth) {
+      setJsonTransactions([]);
+      return;
+    }
+    const load = async () => {
       try {
-        const monthString = String(selectedMonth).padStart(2, "0");
-
-        // IMPORTANT: JSON must be inside public/Data/
-        const response = await fetch(
-          `/Data/${currentYear}-${monthString}.json`,
-        );
-
-        if (!response.ok) throw new Error("No JSON file found");
-
-        const data = await response.json();
-        setJsonTransactions(data);
-      } catch (error) {
-        console.log("No JSON file available for this month");
+        const ms = String(selectedMonth).padStart(2, "0");
+        const res = await fetch(`/Data/${currentYear}-${ms}.json`);
+        if (!res.ok) throw new Error();
+        setJsonTransactions(await res.json());
+      } catch {
         setJsonTransactions([]);
       }
     };
-
-    loadPreviousMonthData();
+    load();
   }, [selectedMonth, currentMonth, currentYear]);
 
-  /* -------------------- CATEGORY MAP (FIXED ICON BUG) -------------------- */
+  /* ── Category helpers ──────────────────────────────────────────────────── */
   const categoryMap = useMemo(() => {
     const map = {};
-    safeCategories.forEach((cat) => {
-      map[String(cat.id)] = cat; // Normalize key as string
+    safeCategories.forEach((c) => {
+      map[String(c.id)] = c;
     });
     return map;
   }, [safeCategories]);
 
-  const getCategory = (categoryId) => {
-    return categoryMap[String(categoryId)] || null;
-  };
+  const getCategory = (id) => categoryMap[String(id)] ?? null;
+  const getCatColor = (id) => CATEGORY_COLORS[Number(id)] ?? "#94A3B8";
 
-  /* -------------------- FILTER TRANSACTIONS -------------------- */
+  /* ── Filter ────────────────────────────────────────────────────────────── */
   const filteredTransactions = useMemo(() => {
     if (selectedMonth === currentMonth) {
       return safeTransactions.filter((tx) => {
-        const txDate = new Date(tx.date || tx.createdAt);
+        const d = new Date(tx.date || tx.createdAt);
         return (
-          txDate.getMonth() + 1 === selectedMonth &&
-          txDate.getFullYear() === currentYear
+          d.getMonth() + 1 === selectedMonth && d.getFullYear() === currentYear
         );
       });
     }
-
     return jsonTransactions;
   }, [
     safeTransactions,
@@ -84,20 +94,20 @@ const TransactionHistory = () => {
     currentYear,
   ]);
 
-  /* -------------------- TOTALS -------------------- */
-  const totalExpense = useMemo(() => {
-    return filteredTransactions
-      .filter((tx) => tx.type === "Expense")
-      .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+  /* ── Totals ────────────────────────────────────────────────────────────── */
+  const { totalIncome, totalExpense } = useMemo(() => {
+    let income = 0,
+      expense = 0;
+    filteredTransactions.forEach((tx) => {
+      if (tx.type === "Income") income += Number(tx.amount || 0);
+      else expense += Number(tx.amount || 0);
+    });
+    return { totalIncome: income, totalExpense: expense };
   }, [filteredTransactions]);
 
-  const totalIncome = useMemo(() => {
-    return filteredTransactions
-      .filter((tx) => tx.type === "Income")
-      .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-  }, [filteredTransactions]);
+  const net = totalIncome - totalExpense;
 
-  /* -------------------- GROUP BY DATE -------------------- */
+  /* ── Group by date ─────────────────────────────────────────────────────── */
   const groupedByDate = useMemo(() => {
     const groups = {};
     const today = new Date().toISOString().slice(0, 10);
@@ -108,19 +118,16 @@ const TransactionHistory = () => {
     for (const tx of filteredTransactions) {
       const txDate =
         tx.date ?? (tx.createdAt ? tx.createdAt.slice(0, 10) : today);
-
       const label =
         txDate === today
           ? "Today"
           : txDate === yesterday
             ? "Yesterday"
             : txDate;
-
       if (!groups[label]) groups[label] = [];
       groups[label].push(tx);
     }
 
-    // Sort each group by time (descending)
     Object.values(groups).forEach((arr) =>
       arr.sort((a, b) => {
         const ta = (a.time ?? "00:00").replace(":", "");
@@ -129,11 +136,9 @@ const TransactionHistory = () => {
       }),
     );
 
-    const otherKeys = Object.keys(groups).filter(
-      (k) => k !== "Today" && k !== "Yesterday",
-    );
-
-    otherKeys.sort((a, b) => b.localeCompare(a));
+    const otherKeys = Object.keys(groups)
+      .filter((k) => k !== "Today" && k !== "Yesterday")
+      .sort((a, b) => b.localeCompare(a));
 
     const orderedKeys = [];
     if (groups["Today"]) orderedKeys.push("Today");
@@ -143,107 +148,163 @@ const TransactionHistory = () => {
     return { groups, orderedKeys };
   }, [filteredTransactions]);
 
-  const handleMonthChange = (e) => {
-    setSelectedMonth(Number(e.target.value));
-  };
-
   return (
-    <div className="bg-[#121212] text-white p-4 pt-6 shadow-lg pb-10 min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Transaction History</h2>
+    <div className="bg-[#121212] text-white min-h-screen pb-28">
+      {/* ── Sticky header ──────────────────────────────────────────────────── */}
+      <div className="sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-md px-4 pt-6 pb-3 border-b border-white/6">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-gray-500">
+              History
+            </p>
+            <h2 className="text-xl font-bold leading-tight">
+              {MONTHS[selectedMonth - 1]}
+            </h2>
+          </div>
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="bg-[#2A2A2E] text-white text-sm px-3 py-2 rounded-xl border border-white/10 appearance-none"
+          >
+            {MONTHS.map((name, i) => (
+              <option key={i + 1} value={i + 1}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-        <select
-          value={selectedMonth}
-          onChange={handleMonthChange}
-          className="bg-gray-800 text-white p-2 rounded-lg"
-        >
-          {Array.from({ length: 12 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {new Date(0, i).toLocaleString("default", {
-                month: "long",
-              })}
-            </option>
+      <div className="px-4 pt-4 space-y-4">
+        {/* ── Summary strip ────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: "Income", value: fmt(totalIncome), color: "#22C55E" },
+            { label: "Expense", value: fmt(totalExpense), color: "#F43F5E" },
+            {
+              label: "Net",
+              value: fmt(Math.abs(net)),
+              color: net >= 0 ? "#22C55E" : "#F43F5E",
+              prefix: net >= 0 ? "+" : "-",
+            },
+          ].map(({ label, value, color, prefix = "" }) => (
+            <div
+              key={label}
+              className="rounded-2xl bg-[#1C1C1E] border border-white/8 px-3 py-3 flex flex-col gap-1"
+            >
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                {label}
+              </p>
+              <p className="text-sm font-bold truncate" style={{ color }}>
+                {prefix}₹{value}
+              </p>
+            </div>
           ))}
-        </select>
-      </div>
-
-      {/* Totals */}
-      <div className="flex justify-between items-center bg-linear-to-br from-white/10 via-white/5 to-white/10 p-4 rounded-lg shadow-md mb-4">
-        <div>
-          <p className="text-sm text-gray-400">Total Income</p>
-          <p className="text-lg font-bold text-green-400">
-            ₹{totalIncome.toFixed(2)}
-          </p>
         </div>
 
-        <div>
-          <p className="text-sm text-gray-400">Total Expense</p>
-          <p className="text-lg font-bold text-red-400">
-            ₹{totalExpense.toFixed(2)}
+        {/* ── Transaction count pill ───────────────────────────────────────── */}
+        {filteredTransactions.length > 0 && (
+          <p className="text-[11px] text-gray-600 text-right">
+            {filteredTransactions.length} transaction
+            {filteredTransactions.length !== 1 ? "s" : ""}
           </p>
-        </div>
-      </div>
+        )}
 
-      {/* Transaction List */}
-      {groupedByDate.orderedKeys.length === 0 ? (
-        <p className="text-center text-gray-400">No transactions found</p>
-      ) : (
-        groupedByDate.orderedKeys.map((label) => (
-          <div key={label} className="mb-6">
-            <h3 className="text-gray-400 text-sm font-semibold mb-2">
-              {label}
-            </h3>
+        {/* ── Empty state ──────────────────────────────────────────────────── */}
+        {groupedByDate.orderedKeys.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <span className="text-5xl">🗂️</span>
+            <p className="text-gray-500 text-sm">
+              No transactions in {MONTHS[selectedMonth - 1]}
+            </p>
+          </div>
+        )}
 
-            <ul className="space-y-4">
-              {groupedByDate.groups[label].map((t, index) => {
-                const category = getCategory(t.categoryId);
+        {/* ── Grouped list ─────────────────────────────────────────────────── */}
+        {groupedByDate.orderedKeys.map((label) => {
+          // day-level subtotal
+          const dayTxs = groupedByDate.groups[label];
+          const dayExpense = dayTxs
+            .filter((t) => t.type !== "Income")
+            .reduce((s, t) => s + Number(t.amount || 0), 0);
 
-                return (
-                  <li
-                    key={t.id ?? index}
-                    className="flex items-center justify-between rounded-2xl shadow-lg bg-gray-800 p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-700">
-                        <span className="text-xl text-white">
+          return (
+            <div key={label}>
+              {/* date label row */}
+              <div className="flex justify-between items-center mb-2 px-1">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  {label}
+                </p>
+                {dayExpense > 0 && (
+                  <p className="text-[11px] text-gray-600">
+                    −₹{fmt(dayExpense)}
+                  </p>
+                )}
+              </div>
+
+              {/* cards */}
+              <ul className="space-y-2">
+                {dayTxs.map((t, idx) => {
+                  const category = getCategory(t.categoryId);
+                  const color = getCatColor(t.categoryId);
+                  const isIncome = t.type === "Income";
+
+                  return (
+                    <li
+                      key={t.id ?? idx}
+                      className="flex items-center gap-3 bg-[#1C1C1E] rounded-2xl px-4 py-3 border border-white/6 active:scale-[0.98] transition-transform"
+                    >
+                      {/* icon bubble */}
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{
+                          backgroundColor: color + "22",
+                          border: `1px solid ${color}44`,
+                        }}
+                      >
+                        <span className="text-xl leading-none">
                           {category?.icon ?? "📦"}
                         </span>
                       </div>
 
-                      <div>
-                        <p className="text-sm font-semibold">
-                          {t.subcategoryName}
+                      {/* details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">
+                          {t.subcategoryName || category?.name || "Transaction"}
                         </p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {/* category color dot */}
+                          <span
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: color }}
+                          />
+                          <p className="text-[11px] text-gray-500 truncate">
+                            {category?.name ?? "Unknown"}
+                            {t.paymentMethod ? ` · ${t.paymentMethod}` : ""}
+                          </p>
+                        </div>
+                      </div>
 
-                        <p className="text-xs text-gray-400">
-                          {category?.name ?? "Unknown"} •{" "}
-                          {t.paymentMethod ?? "N/A"}
+                      {/* amount + time */}
+                      <div className="text-right flex-shrink-0">
+                        <p
+                          className="text-sm font-bold"
+                          style={{ color: isIncome ? "#22C55E" : "#F87171" }}
+                        >
+                          {isIncome ? "+" : "−"}₹{fmt(t.amount)}
+                        </p>
+                        <p className="text-[10px] text-gray-600 mt-0.5">
+                          {t.time ?? ""}
                         </p>
                       </div>
-                    </div>
-
-                    <div className="text-right">
-                      <p
-                        className={`text-sm font-bold ${
-                          t.type === "Income"
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }`}
-                      >
-                        {t.type === "Income" ? "+" : "-"}₹
-                        {Number(t.amount || 0).toFixed(2)}
-                      </p>
-
-                      <p className="text-xs text-gray-400">{t.time ?? "N/A"}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))
-      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
 
       <BottomNav />
     </div>

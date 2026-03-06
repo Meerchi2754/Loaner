@@ -1,58 +1,54 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { db } from "../db/appDB";
-import { useDispatch, useSelector } from "react-redux";
-import { addCategories } from "../features/categorySlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { defaultCategories } from "../model/category";
+
+// ── Category colors (same palette across all pages) ─────────────────────────
+const CATEGORY_COLORS = {
+  1: "#F97316",
+  2: "#60A5FA",
+  11: "#A78BFA",
+  3: "#FBBF24",
+  4: "#F43F5E",
+  5: "#34D399",
+  6: "#FB7185",
+  7: "#94A3B8",
+  8: "#38BDF8",
+  9: "#22C55E",
+  10: "#E879F9",
+};
+
+const PAYMENT_METHODS = [
+  { value: "GPAY", label: "GPay", icon: "📱" },
+  { value: "BHIM", label: "BHIM", icon: "🇮🇳" },
+  { value: "CASH", label: "Cash", icon: "💵" },
+  { value: "CHEQUE", label: "Cheque", icon: "📄" },
+];
 
 export default function AddTransaction() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const categories = useSelector((state) => state.category.categories);
+  const safeCategories = categories?.length ? categories : defaultCategories;
 
   const [type, setType] = useState("Expense");
   const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("GPAY"); // Default payment method
+  const [paymentMethod, setPaymentMethod] = useState("GPAY");
   const [categoryId, setCategoryId] = useState("");
-  const [subcategories, setSubcategories] = useState([]);
-  // const [subcategoriesId, setSubcategoriesId] = useState("");
-  //const [subcategoryName, setSubcategoryName] = useState("");
-
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10)); // "YYYY-MM-DD"
-  const [time, setTime] = useState(() => new Date().toTimeString().slice(0, 5)); // "HH:MM"
-
+  const [subcategories, setSubcategories] = useState("");
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [time, setTime] = useState(() => new Date().toTimeString().slice(0, 5));
   const [note, setNote] = useState("");
-  const [isRecurring, setIsRecurring] = useState(false); // State for recurring transactions
-  const [isLoading, setIsLoading] = useState(false); // Loading state for save button
+  const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   async function loadSubcategories() {
-  //     if (!categoryId || isNaN(Number(categoryId))) {
-  //       //console.error("Invalid categoryId:", categoryId);
-  //       setSubcategories([]);
-  //       return;
-  //     }
+  const selectedCat = safeCategories.find((c) => c.id === Number(categoryId));
+  const selectedColor = CATEGORY_COLORS[Number(categoryId)] ?? "#60A5FA";
+  const isExpense = type === "Expense";
 
-  //     try {
-  //       const data = await db.subcategories
-  //         .where("categoryId")
-  //         .equals(Number(categoryId))
-  //         .toArray();
-  //       setSubcategories(data);
-  //     } catch (error) {
-  //       console.error("Failed to load subcategories:", error);
-  //     }
-  //   }
-
-  //   loadSubcategories();
-  // }, [categoryId]);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-
-    // Validation
+  async function handleSubmit() {
     if (!amount || Number(amount) <= 0) {
-      toast.error("Please enter a valid amount greater than 0.");
+      toast.error("Enter a valid amount.");
       return;
     }
     if (!categoryId) {
@@ -64,199 +60,221 @@ export default function AddTransaction() {
       type,
       amount: Number(amount),
       categoryId: Number(categoryId),
-      // subcategoriesId: subcategoriesId ? Number(subcategoriesId) : null,
-      // subcategoryName: subcategoryName ? subcategoryName.trim() : null,
-      subcategories,
+      subcategories: subcategories.trim() || null,
       paymentMethod,
       date,
       time,
       note: note.trim() || null,
-      isRecurring,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      setIsLoading(true); // Set loading state
+      setIsLoading(true);
       await db.transactions.add(payload);
-      toast.success("Transaction Saved!");
+      toast.success("Transaction saved!");
       navigate("/home");
-      setAmount("");
-      setNote("");
-      setSubcategories("");
-      // setSubcategoriesId("");
-      // setSubcategoryName("");
-    } catch (error) {
-      toast.error("Failed to save transaction. Please try again.");
+    } catch {
+      toast.error("Failed to save. Try again.");
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-800 text-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-700 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Add Transaction</h3>
-          <button
-            type="button"
-            className="text-gray-400 hover:text-white"
-            aria-label="close"
-            onClick={() => navigate("/home")}
-          >
-            ✕
-          </button>
+    <div className="min-h-screen bg-[#121212] text-white flex flex-col">
+      {/* ── Top bar ────────────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between px-4 pt-6 pb-2">
+        <button
+          onClick={() => navigate("/home")}
+          className="w-9 h-9 rounded-full bg-white/8 flex items-center justify-center text-lg"
+        >
+          ←
+        </button>
+        <h1 className="text-base font-bold">Add Transaction</h1>
+        <div className="w-9" />
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 pb-10 space-y-5 pt-2">
+        {/* ── Type toggle ────────────────────────────────────────────────── */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-1 flex gap-1">
+          {["Expense", "Income"].map((t) => {
+            const active = type === t;
+            const color = t === "Expense" ? "#F43F5E" : "#22C55E";
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setType(t)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
+                style={{
+                  backgroundColor: active ? color : "transparent",
+                  color: active ? "#fff" : "#6B7280",
+                }}
+              >
+                {t === "Expense" ? "💸 Expense" : "💰 Income"}
+              </button>
+            );
+          })}
         </div>
 
-        <form onSubmit={handleSubmit} className="px-6 py-6 space-y-4">
-          {/* Type Toggle */}
-          <div className="bg-gray-700 rounded-xl p-1 flex gap-1">
-            <button
-              type="button"
-              onClick={() => setType("Expense")}
-              className={`flex-1 text-sm py-2 rounded-lg font-semibold transition ${
-                type === "Expense"
-                  ? "bg-red-500 text-white shadow"
-                  : "text-gray-300 hover:bg-gray-700"
-              }`}
-            >
-              Expense
-            </button>
-            <button
-              type="button"
-              onClick={() => setType("Income")}
-              className={`flex-1 text-sm py-2 rounded-lg font-semibold transition ${
-                type === "Income"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-gray-300 hover:bg-gray-700"
-              }`}
-            >
-              Income
-            </button>
+        {/* ── Amount ─────────────────────────────────────────────────────── */}
+        <div className="rounded-2xl bg-[#1C1C1E] border border-white/8 px-5 py-6 text-center">
+          <p
+            className="text-[10px] uppercase tracking-widest mb-2"
+            style={{ color: isExpense ? "#F43F5E" : "#22C55E" }}
+          >
+            {isExpense ? "Expense Amount" : "Income Amount"}
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-3xl font-black text-gray-400">₹</span>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="bg-transparent text-5xl font-black text-white text-center focus:outline-none w-48"
+              placeholder="0"
+              min="0"
+              step="1"
+              inputMode="decimal"
+            />
           </div>
+        </div>
 
-          {/* Amount Input */}
-          <div className="text-center">
-            <div className="text-xs text-gray-400">AMOUNT</div>
-            <div className="mt-2 flex items-end justify-center gap-2">
-              <span className="text-4xl text-gray-300 font-bold">₹</span>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="bg-transparent text-4xl font-bold text-white text-center focus:outline-none w-40"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            </div>
+        {/* ── Category grid ──────────────────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+            Category
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {safeCategories.map((cat) => {
+              const active = Number(categoryId) === cat.id;
+              const color = CATEGORY_COLORS[cat.id] ?? "#94A3B8";
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategoryId(String(cat.id))}
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all active:scale-95"
+                  style={{
+                    backgroundColor: active ? color + "22" : "#1C1C1E",
+                    borderColor: active ? color : "rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <span className="text-2xl leading-none">{cat.icon}</span>
+                  <span
+                    className="text-[10px] font-medium truncate w-full text-center px-1"
+                    style={{ color: active ? color : "#9CA3AF" }}
+                  >
+                    {cat.name}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-         
+        </div>
+
+        {/* ── Payment method pills ───────────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+            Payment Method
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {PAYMENT_METHODS.map(({ value, label, icon }) => {
+              const active = paymentMethod === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setPaymentMethod(value)}
+                  className="flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-semibold transition-all"
+                  style={{
+                    backgroundColor: active ? "#3B82F622" : "#1C1C1E",
+                    borderColor: active ? "#3B82F6" : "rgba(255,255,255,0.06)",
+                    color: active ? "#60A5FA" : "#6B7280",
+                  }}
+                >
+                  <span className="text-lg">{icon}</span>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Date & Time row ────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label>Date</label>
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+              Date
+            </p>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
+              className="w-full bg-[#1C1C1E] text-white rounded-xl px-3 py-3 text-sm border border-white/8 focus:outline-none focus:border-blue-500/50"
             />
           </div>
-          {/* Category */}
           <div>
-            <label className="block text-sm text-gray-300 mb-2">Category</label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
-            >
-              <option value="">Select category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Payment Method */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-2">
-              Payment Method
-            </label>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none"
-            >
-              <option value="GPAY">GPAY</option>
-              <option value="BHIM">BHIM</option>
-              <option value="CASH">CASH</option>
-              <option value="CHEQUE">CHEQUE</option>
-            </select>
-          </div>
-
-          {/* Subcategory */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-2">
-              SubCategory
-            </label>
-            <textarea
-              value={subcategories}
-              onChange={(e) => setSubcategories(e.target.value)}
-              // placeholder={
-              //   categoryId
-              //     ? "Enter subcategory name (optional)"
-              //     : "Select a category first"
-              // }
-              // disabled={!categoryId}
-              placeholder="Enter subcategory name (optional)"
-              rows={2}
-              className="w-full bg-gray-700 text-white rounded-lg p-3 border border-gray-600 resize-none focus:outline-none placeholder-gray-400"
-            />
-          </div>
-
-          {/* Note */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-2">
-              Note (Optional)
-            </label>
-            <textarea
-              value={note}
-              placeholder="What was this for?"
-              onChange={(e) => setNote(e.target.value)}
-              rows={3}
-              className="w-full bg-gray-700 text-white rounded-lg p-3 border border-gray-600 resize-none focus:outline-none placeholder-gray-400"
-            />
-          </div>
-
-          {/* Recurring checkbox
-          <div className="flex items-center gap-2">
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+              Time
+            </p>
             <input
-              id="recurring"
-              type="checkbox"
-              checked={isRecurring}
-              onChange={(e) => setIsRecurring(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-500"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="w-full bg-[#1C1C1E] text-white rounded-xl px-3 py-3 text-sm border border-white/8 focus:outline-none focus:border-blue-500/50"
             />
-            <label htmlFor="recurring" className="text-sm text-gray-300">
-              Recurring transaction
-            </label>
-          </div> */}
-
-          {/* Save button */}
-          <div>
-            <button
-              type="submit"
-              className={`w-full ${
-                isLoading
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
-              } text-white font-semibold py-3 rounded-lg shadow`}
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Transaction"}
-            </button>
           </div>
-        </form>
+        </div>
+
+        {/* ── Subcategory ────────────────────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+            Subcategory{" "}
+            <span className="normal-case text-gray-600">(optional)</span>
+          </p>
+          <input
+            type="text"
+            value={subcategories}
+            onChange={(e) => setSubcategories(e.target.value)}
+            placeholder={
+              selectedCat
+                ? `e.g. ${selectedCat.name} detail…`
+                : "e.g. Groceries, Petrol..."
+            }
+            className="w-full bg-[#1C1C1E] text-white rounded-xl px-4 py-3 text-sm border border-white/8 focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+          />
+        </div>
+
+        {/* ── Note ───────────────────────────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 px-1">
+            Note <span className="normal-case text-gray-600">(optional)</span>
+          </p>
+          <textarea
+            value={note}
+            placeholder="What was this for?"
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            className="w-full bg-[#1C1C1E] text-white rounded-xl px-4 py-3 text-sm border border-white/8 resize-none focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+          />
+        </div>
+
+        {/* ── Save button ────────────────────────────────────────────────── */}
+        <button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="w-full py-4 rounded-2xl text-sm font-black tracking-wide transition-all active:scale-95 disabled:opacity-40"
+          style={{
+            background: isLoading
+              ? "#374151"
+              : isExpense
+                ? "linear-gradient(135deg, #F43F5E, #FB7185)"
+                : "linear-gradient(135deg, #22C55E, #34D399)",
+          }}
+        >
+          {isLoading ? "Saving…" : `Save ${type}`}
+        </button>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import LockScreen from "./component/LockScreen";
 import HomeScreen from "./pages/HomeScreen";
 import AddTransaction from "./pages/AddTransaction";
 import HistoryTransaction from "./component/HistoryTransaction";
-// import Stats from "./pages/Stats";
+import Stats from "./pages/Stats";
 import TransactionPage from "./pages/TransactionHistory";
 import Settings from "./pages/Settings";
 import Budget from "./pages/Budget";
@@ -54,7 +54,7 @@ function App() {
         <Route path="/addtransaction" element={<AddTransaction />} />
         <Route path="/history" element={<HistoryTransaction />} />
         <Route path="/transactionspath" element={<TransactionPage />} />
-        {/* <Route path="/stats" element={<Stats />} /> */}
+        <Route path="/stats" element={<Stats />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/budget" element={<Budget />} />
       </Routes>
