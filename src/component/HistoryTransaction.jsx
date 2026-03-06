@@ -120,7 +120,7 @@ const HistoryTransaction = ({ categories, allTransactions }) => {
                       {/* Transaction Details */}
                       <div>
                         <p className="text-sm font-semibold">
-                          {t.subcategoryName}
+                          {t.subcategories}
                         </p>
                         <p className="text-xs text-gray-400">
                           {categories.find((c) => c.id === t.categoryId)

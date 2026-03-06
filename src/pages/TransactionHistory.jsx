@@ -270,12 +270,12 @@ const TransactionHistory = () => {
                       {/* details */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">
-                          {t.subcategoryName || category?.name || "Transaction"}
+                          {t.subcategories || category?.name || "Transaction"}
                         </p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           {/* category color dot */}
                           <span
-                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
                             style={{ backgroundColor: color }}
                           />
                           <p className="text-[11px] text-gray-500 truncate">
@@ -286,7 +286,7 @@ const TransactionHistory = () => {
                       </div>
 
                       {/* amount + time */}
-                      <div className="text-right flex-shrink-0">
+                      <div className="text-right shrink-0">
                         <p
                           className="text-sm font-bold"
                           style={{ color: isIncome ? "#22C55E" : "#F87171" }}
