@@ -1,133 +1,179 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
-import {
-  FaWallet,
-  FaHome,
-  FaExchangeAlt,
-  FaChartBar,
-  FaWallet as FaBudget,
-  FaCog,
-} from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const LockScreen = () => {
-  const [pin, setPin] = useState(["", "", "", ""]);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const navigate = useNavigate();
-  const userPin = useSelector((state) => state.user.password);
-  const handlePinInput = (index, value) => {
-    if (value.length > 1) return;
-    if (!/^\d*$/.test(value)) return;
+const NUMPAD = [
+  ["1", "2", "3"],
+  ["4", "5", "6"],
+  ["7", "8", "9"],
+  ["", "0", "⌫"],
+];
 
-    const newPin = [...pin];
-    newPin[index] = value;
+const LockScreen = () => {
+  const [pin,       setPin]       = useState([]);
+  const [shake,     setShake]     = useState(false);
+  const navigate  = useNavigate();
+  const userPin   = useSelector((state) => state.user.password);
+
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => { setShake(false); setPin([]); }, 600);
+  };
+
+  const handleKey = (key) => {
+    if (key === "") return;
+
+    if (key === "⌫") {
+      setPin((p) => p.slice(0, -1));
+      return;
+    }
+
+    if (pin.length >= 4) return;
+
+    const newPin = [...pin, key];
     setPin(newPin);
 
-    // Auto-focus to next input
-    if (value && index < 3) {
-      document.getElementById(`pin-${index + 1}`)?.focus();
+    // Auto-check when 4 digits entered
+    if (newPin.length === 4) {
+      setTimeout(() => {
+        if (newPin.join("") === userPin) {
+          navigate("/home");
+        } else {
+          toast.error("Incorrect PIN");
+          triggerShake();
+        }
+      }, 120);
     }
   };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !pin[index] && index > 0) {
-      document.getElementById(`pin-${index - 1}`)?.focus();
-    }
-  };
-
-  // const handleUnlock = () => {
-  //   if (pin.every((digit) => digit !== "")) {
-  //     setIsUnlocked(true);
-  //     // Reset PIN after 1 second
-  //     setTimeout(() => {
-  //       setPin(["", "", "", ""]);
-  //       //setIsUnlocked(false);
-  //     }, 1000);
-  //   }
-  // };
-  const handleUnlock = () => {
-    if (pin.every((digit) => digit !== "")) {
-      const enteredPin = pin.join(""); // Combine the PIN array into a single string
-      if (enteredPin === userPin) {
-        //localStorage.setItem("isAuthenticated", "true"); // Set authentication flag
-        navigate("/home"); // Redirect to the home page
-      } else {
-        toast.error("Incorrect PIN. Please try again.");
-        //alert("Incorrect PIN. Please try again."); // Show an error message
-        setPin(["", "", "", ""]); // Reset the PIN
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (isUnlocked) {
-      navigate("/home");
-      // navigate("/addtransaction");
-    }
-  }, [isUnlocked, navigate]);
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 flex flex-col items-center justify-center px-4 sm:px-6 py-8">
-      {/* Main Content */}
-      <div className="w-full max-w-sm flex flex-col items-center gap-6 sm:gap-8">
-        {/* Wallet Icon */}
-        <div className="bg-blue-500 rounded-3xl p-4 sm:p-6">
-          <svg
-            className="w-12 h-12 sm:w-16 sm:h-16 text-white"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
+    <div className="min-h-screen flex flex-col items-center justify-between px-6 py-10 select-none relative overflow-hidden"
+      style={{ background: "#0a0a12" }}>
+
+      {/* ── Animated gradient mesh ───────────────────────────────────────── */}
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        <div style={{
+          position:"absolute", top:"-10%", left:"-15%",
+          width:"65vw", height:"65vw", borderRadius:"50%",
+          background:"radial-gradient(circle, #3B82F6 0%, transparent 70%)",
+          opacity:0.20, filter:"blur(48px)",
+          animation:"orb1 9s ease-in-out infinite alternate",
+        }}/>
+        <div style={{
+          position:"absolute", top:"35%", right:"-20%",
+          width:"55vw", height:"55vw", borderRadius:"50%",
+          background:"radial-gradient(circle, #6366F1 0%, transparent 70%)",
+          opacity:0.17, filter:"blur(52px)",
+          animation:"orb2 11s ease-in-out infinite alternate",
+        }}/>
+        <div style={{
+          position:"absolute", bottom:"5%", left:"15%",
+          width:"45vw", height:"45vw", borderRadius:"50%",
+          background:"radial-gradient(circle, #22C55E 0%, transparent 70%)",
+          opacity:0.11, filter:"blur(44px)",
+          animation:"orb3 13s ease-in-out infinite alternate",
+        }}/>
+      </div>
+
+      {/* ── Top section ──────────────────────────────────────────────────── */}
+      <div className="relative z-10 flex flex-col items-center gap-4 pt-8">
+
+        {/* App icon */}
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+          style={{ background: "linear-gradient(135deg, #3B82F6, #6366F1)" }}>
+          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h6v2h-6z" />
           </svg>
         </div>
 
-        {/* Welcome Text */}
         <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base">
-            Enter your PIN to access your finances
-          </p>
+          <h1 className="text-2xl font-black text-white tracking-tight">Hisab</h1>
+          <p className="text-gray-500 text-sm mt-1">Enter your PIN to continue</p>
         </div>
-
-        {/* PIN Input Fields */}
-        <div className="flex gap-3 sm:gap-4">
-          {pin.map((digit, index) => (
-            <input
-              key={index}
-              id={`pin-${index}`}
-              type="password" // Keeps the input hidden
-              inputMode="numeric" // Ensures numeric keypad on mobile devices
-              maxLength="1"
-              value={digit}
-              onChange={(e) => handlePinInput(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gray-800 border border-gray-700 rounded-xl text-white text-center text-lg sm:text-xl font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition"
-              placeholder=""
-            />
-          ))}
-        </div>
-
-        {/* Unlock Button */}
-        <button
-          onClick={handleUnlock}
-          disabled={!pin.every((digit) => digit !== "")}
-          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 sm:py-4 rounded-xl transition duration-200 text-sm sm:text-base"
-        >
-          Unlock Dashboard
-        </button>
       </div>
+
+      {/* ── PIN dots ─────────────────────────────────────────────────────── */}
+      <div className="relative z-10 flex flex-col items-center gap-8">
+        <div
+          className={`flex gap-4 transition-transform ${shake ? "animate-shake" : ""}`}
+          style={shake ? { animation: "shake 0.5s ease" } : {}}
+        >
+          {[0, 1, 2, 3].map((i) => {
+            const filled = i < pin.length;
+            return (
+              <div key={i}
+                className="w-4 h-4 rounded-full border-2 transition-all duration-150"
+                style={{
+                  backgroundColor: filled ? "#3B82F6" : "transparent",
+                  borderColor:     filled ? "#3B82F6" : "#374151",
+                  transform:       filled ? "scale(1.15)" : "scale(1)",
+                  boxShadow:       filled ? "0 0 10px #3B82F688" : "none",
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* ── Numpad ─────────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-3 w-72">
+          {NUMPAD.flat().map((key, idx) => {
+            const isEmpty  = key === "";
+            const isDelete = key === "⌫";
+            return (
+              <button
+                key={idx}
+                onClick={() => handleKey(key)}
+                disabled={isEmpty}
+                className="h-16 rounded-2xl text-xl font-bold transition-all active:scale-90 disabled:opacity-0"
+                style={{
+                  backgroundColor: isEmpty
+                    ? "transparent"
+                    : isDelete
+                    ? "rgba(239,68,68,0.12)"
+                    : "rgba(255,255,255,0.06)",
+                  color: isDelete ? "#F87171" : "#F9FAFB",
+                  border: isEmpty ? "none" : "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                {key}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Bottom hint ──────────────────────────────────────────────────── */}
+      <p className="relative z-10 text-gray-600 text-xs text-center">
+        Your data stays on this device only
+      </p>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes shake {
+          0%,100% { transform: translateX(0); }
+          15%      { transform: translateX(-8px); }
+          30%      { transform: translateX(8px); }
+          45%      { transform: translateX(-6px); }
+          60%      { transform: translateX(6px); }
+          75%      { transform: translateX(-3px); }
+          90%      { transform: translateX(3px); }
+        }
+        @keyframes orb1 {
+          0%   { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(8vw, 6vh) scale(1.15); }
+        }
+        @keyframes orb2 {
+          0%   { transform: translate(0, 0) scale(1.05); }
+          100% { transform: translate(-6vw, -8vh) scale(0.9); }
+        }
+        @keyframes orb3 {
+          0%   { transform: translate(0, 0) scale(0.95); }
+          100% { transform: translate(5vw, -5vh) scale(1.1); }
+        }
+      `}</style>
     </div>
   );
 };
-
-const NavItem = ({ icon, label }) => (
-  <div className="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-500 cursor-pointer transition text-xs sm:text-sm">
-    <span className="text-lg sm:text-2xl">{icon}</span>
-    <span className="hidden sm:inline">{label}</span>
-  </div>
-);
 
 export default LockScreen;
