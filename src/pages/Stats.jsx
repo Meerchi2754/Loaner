@@ -130,7 +130,7 @@ export default function Stats() {
   const { totalIncome, totalExpense } = useMemo(() => {
     let income = 0, expense = 0;
     filteredTransactions.forEach((tx) => {
-      if (tx.type === "income") income += Number(tx.amount || 0);
+      if (tx.type === "Income") income += Number(tx.amount || 0);
       else expense += Number(tx.amount || 0);
     });
     return { totalIncome: income, totalExpense: expense };
