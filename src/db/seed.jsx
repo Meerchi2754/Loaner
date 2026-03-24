@@ -91,6 +91,7 @@ export async function seedDatabase() {
       console.log("✅ Transactions seeded");
     }
   } catch (err) {
+    console.log("ERROR:", err);
     console.error("❌ Seeding failed:", err);
   }
 }
