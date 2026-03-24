@@ -85,7 +85,7 @@ export async function seedDatabase() {
           createdAt: "2026-01-15T10:15:16.152Z",
         },
       ];
-
+      console.log("Seeding Started Before.");
       console.log("Seeding Started: Adding sample transactions...");
       await db.transactions.bulkAdd(sampleTransactions);
       console.log("✅ Transactions seeded");
